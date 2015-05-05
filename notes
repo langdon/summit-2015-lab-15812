@@ -1,0 +1,73 @@
+Summit lab planning meeting 5/4:
+Containerizing applications, existing and new
+
+Agenda for this meeting: 
+- Determine ownership 
+- Determine lab environment 
+  * BYOC
+    * you should have vagrant installed and running already
+    * need to provide a download package that they should have local (but can still be compressed)
+  * lab machine requirements
+    - with vagrant
+    - w/o vagrant
+  * nested KVM
+- Determine high-level scope of lab
+  - install CDK [dependent on environment decisions]
+  - download atomic vm or login to cloud atomic instance ("download" means from a stick or already local copy might be able to have some/all preinstalled but the risk of GA being too soon )
+  - decompose app, architecture
+    - idea: for lab manual maybe we develop an "app decomposition guide"?
+  - develop: single container -> break out into multiple containers -> orchestration
+    * Single Container (first try)
+      * dockerfile with "keywords" missing
+      * help the class to "fill in the missing keywords"
+      * help them to deploy on either a local atomic vm or "in the cloud"
+    * Multi-container (2nd try)
+      * set of dockerfiles with "keywords" missing
+      * help the class to "fill in the missing keywords"
+      * help them to deploy on either a local atomic vm or "in the cloud"
+    * Orchestration (right way)
+      * using prior set of dockerfiles, add missing keyword kubernetes files
+      * help the class to "fill in the missing keywords"
+      * help them to deploy on either a local atomic vm or "in the cloud"
+    * move that stuff in to openshift enterprise
+      - we need have an instance of openshift enterprise
+      * take prior kube and docker files and deploy to openshift enterprise (ours)
+    
+Alternate scope:
+3 different kinds of applications:
+- "traditional" service (web + db)
+- developement shell or CLI container, focus on atomic run?
+- ???
+
+add base images, maybe more to all VMs so that lab time is not spent downloading/getting docker images
+
+
+- Determine how to collab on lab manual 
+  * google doc(?) -> .odt (official)
+
+
+
+Abstract https://url.corp.redhat.com/c3ef7c2 
+
+Containerizing applications, existing and new
+
+In this hands-on lab, learn how to use Red Hat container technologies, including the container development kit (CDK), to create containerized applications from scratch and from existing applications. See how to deploy the new containers to Red Hat Enterprise Linux Atomic Host and Openshift by Red Hat. In this lab, you will: 
+
+Quickly develop a basic containerized application. 
+Migrate a simple popular application to a containerized version. 
+Deploy your new applications to a container host. 
+
+You’ll get a feel for the different container host platforms and learn how to choose the best one for your container needs. Plus, you’ll understand what to consider when thinking about implementing a containerized microservices architecture. 
+
+
+Action Items:
+
+Find out what the training people will do for customizing the hosts.
+Nested KVM ?
+  * could we use cloud servers? where?
+Lab capacity?
+Decide what date we need to know if using CDK or not
+will printed copies of ODT be available to students? do they need it?
+where will we get an openshift instance from?
+
+
