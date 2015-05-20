@@ -4,8 +4,15 @@
 |---|---|
 | Technology/Product | Red Hat Enterprise Linux & Containers |
 | Difficulty |  2 |
-| Time  |  ??  |
+| Time  |  120 minutes  |
 | Prerequisites  |   |
+
+## Table of Contents
+
+1. **LAB 1** Docker refresh
+1. **LAB 2** Analyzing a monolithic application
+1. **LAB 3** Deconstructing an application into microservices
+1. **LAB 4** Orchestrated deployment of a decomposed application
 
 ###In this lab you will...
 Containerization has been a hot button topic for quite a while now, with no signs of letting up on the buzz train. However, what is less clear is how one should move an existing application to a containerized model. In this lab, we will take you through the steps that most people go through when attempting to containerize an application. 
@@ -17,37 +24,68 @@ We will also cover how you might start a containerized application. However, tha
 ##Before you begin...
 We will be providing computers for this lab, to ensure we don't lose time on "setup." However, if you have experience with Vagrant and RHEL Atomic Host, you should be able to follow along pretty easily with your own computer. If you do choose to use your own, please come in to the lab with a vagrant deployed instance of RHEL Atomic Host that has Docker running.
 
-## *Decisions regarding lab deployment
-____
 
-* DECISION: use local VMs? use cloud VMs?
-* DECISION: use Fedora as the host as Vagrant is unsupported on RHEL?
-* DECISION: will CDK be available to attendees?
-* DECISION: can we give out deveoper-suite subscriptions to attendees? and/or flag them as having access to the CDK? 
+## LAB 1: Docker refresh
 
-____
+In this lab we will explore the docker environment. If you are familiar with docker this may function as a brief refresher. If you are new to docker this will serve as an introduction to docker basics.
 
-## *Items for Images provided for students
-____
+Expected completion: 10-20 minutes
 
-* Base Image of Fedora 21
-* RHELAH with Docker in a VM
-* vagrant, vagrant-libvirt, vagrant-registration, vagrant-atomic, ?
+* explore environment (OS, basic services, etc.)
+* explore logs
+* using sytemctl
+* using journalctl
+* edit docker config to set private registry
+* review trivial example Dockerfile
+* build an image from Dockerfile
+* inspect image
+* run image
 
-____
+## LAB 2: Analyzing a monolithic application
 
-## Lab Instructions
+In this lab we will create a container image from an existing application. We will build, run and inspect the container. Then we will analyze the services to understand how the various services interact. 
 
-## *Decisions regarding lab content
+Expected completion: 10-20 minutes
 
-____
+* Review Dockerfile
+* run it, confirm connectivity
+* docker ps; docker inspect
+* docker images
+* curl 
+* present an architectual graphic (all-in-one)
 
-* DECISION: what application should we use?
-* DECISION: multi-service via supervisord? something else?
-* DECISION: Can we pre-cache at least the base images?
-* NOTE: would prefer to use the "docker-artifacts" style of Dockerfile content (to not muddy the app)
+Question: which example? Wordpress?
 
-____
+## LAB 3: Deconstructing an application into microservices
+
+In this lab you will deconstruct an application into microservices, creating a multi-container application. In this process we explore the challenges of networking, storage and configuration.
+
+Expected completion: 20-30 minutes
+
+present an architectual graphic (deconstructed, microservices)
+
+answer questions about the app (external reference available?):
+* what services?
+* what ports?
+* how to configure params?
+* how to provide persistent storage?
+
+### Create images
+
+* Create Dockerfiles
+* build, run, test
+
+## LAB 4: Orchestrated deployment of a decomposed application
+
+In this lab we introduce how to orchestrate a multi-container application in Kubernetes.
+
+Expected completion: 40-60 minutes
+
+Question: single host or multi host?
+
+---
+
+## Previously proposed Labs for Reference
 
 ### Application as a multi-service container
 
@@ -86,8 +124,4 @@ ____
 1. play around in the container
   * step 1
   * step 2
-
-### Application as kubernetes managed containers
-
-1. Download binaries and Dockerfiles from http://****
 
