@@ -9,10 +9,21 @@
 
 ## Table of Contents
 
+1. Slides
 1. **LAB 1** Docker refresh
 1. **LAB 2** Analyzing a monolithic application
 1. **LAB 3** Deconstructing an application into microservices
 1. **LAB 4** Orchestrated deployment of a decomposed application
+
+## Abstract (Langdon)
+
+* TODO: change the abstract to remove cdk
+
+## Slides (Langdon)
+
+* Intro to the lab (likely content below)
+* Intro to the people
+* What will we be doing today?
 
 ###In this lab you will...
 Containerization has been a hot button topic for quite a while now, with no signs of letting up on the buzz train. However, what is less clear is how one should move an existing application to a containerized model. In this lab, we will take you through the steps that most people go through when attempting to containerize an application. 
@@ -25,7 +36,7 @@ We will also cover how you might start a containerized application. However, tha
 We will be providing computers for this lab, to ensure we don't lose time on "setup." However, if you have experience with Vagrant and RHEL Atomic Host, you should be able to follow along pretty easily with your own computer. If you do choose to use your own, please come in to the lab with a vagrant deployed instance of RHEL Atomic Host that has Docker running.
 
 
-## LAB 1: Docker refresh
+## LAB 1: Docker refresh (Scott)
 
 In this lab we will explore the docker environment. If you are familiar with docker this may function as a brief refresher. If you are new to docker this will serve as an introduction to docker basics.
 
@@ -41,7 +52,7 @@ Expected completion: 10-20 minutes
 * inspect image
 * run image
 
-## LAB 2: Analyzing a monolithic application
+## LAB 2: Analyzing a monolithic application (Aaron)
 
 In this lab we will create a container image from an existing application. We will build, run and inspect the container. Then we will analyze the services to understand how the various services interact. 
 
@@ -56,7 +67,7 @@ Expected completion: 10-20 minutes
 
 Question: which example? Wordpress?
 
-## LAB 3: Deconstructing an application into microservices
+## LAB 3: Deconstructing an application into microservices (Langdon)
 
 In this lab you will deconstruct an application into microservices, creating a multi-container application. In this process we explore the challenges of networking, storage and configuration.
 
@@ -75,13 +86,18 @@ answer questions about the app (external reference available?):
 * Create Dockerfiles
 * build, run, test
 
-## LAB 4: Orchestrated deployment of a decomposed application
+## LAB 4: Orchestrated deployment of a decomposed application (Langdon)
 
 In this lab we introduce how to orchestrate a multi-container application in Kubernetes.
 
 Expected completion: 40-60 minutes
 
 Question: single host or multi host?
+
+
+## LAB 5: Optional: Walk through packaging with Nulecule
+
+Show using nulecule to package and deploy an application
 
 ---
 
