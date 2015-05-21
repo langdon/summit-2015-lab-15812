@@ -3,6 +3,8 @@
 echo "ensure you have vagrant boxes called 'rhel-7.1' and 'rhel-atomic-host'"
 echo "you also need qemu-img; e.g. yum install qemu-img"
 echo "must be run with sudo"
+echo "kinda assumes you are in the vagrant dir.. not sure that is a good idea, be sure to vagrant halt though if you run this "
+echo "from somewhere else"
 #vagrant up
 #vagrant halt
 
