@@ -1,22 +1,27 @@
+## Lab environment
 
-## lab deployment
+* VMs
+  1. Single RHEL7.1 VM for development
+  1. Single Atomic VM for deployment testing
+* KVM (no vagrant)
+* RHEL7.1 / Atomic
+* No CDK
+* application: wordpress (all-in-one -> 2 containers)
+* Docker images required: rhel7
+* RPM content needed (served locally): `httpd php php-mysql php-gd pwgen supervisor bash-completion openssh-server psmisc tar`
+* Other content:
+  * http://wordpress.org/latest.tar.gz
+  * lab manual served as HTML
+  * lab manual served as PDF (take-home on thumb drive)
+  * tar of other files: wordpress scripts, rpm repo files, Dockerfile(s), etc.
+  * Nulecule files for (optional?) Lab 5
 
-* DECISION: use local VMs~~? use cloud VMs?~~
-* DECISION: ~~use Fedora as the host as Vagrant is unsupported on RHEL?~~
-* DECISION: will CDK be available to attendees? **No**
-* DECISION: can we give out deveoper-suite subscriptions to attendees? and/or flag them as having access to the CDK? 
+## VM configuration
+* Running docker and kubernetes environment. Not required: flannel or skydns
+* Services: docker, kube-apiserver, kube-scheduler, kube-controller-manager, kubelet, kube-proxy, etcd
 
-## *Items for Images provided for students
+## Questions
+* RHEL7.1 for dev; Atomic for testing deployment?
+* can we give out deveoper-suite subscriptions to attendees? and/or flag them as having access to the CDK? 
 
-* ~~Base Image of Fedora 21~~
-* RHELAH with Docker in a VM
-* ~~vagrant, vagrant-libvirt, vagrant-registration, vagrant-atomic, ?~~
-* **KVM**
-
-## lab content
-
-* DECISION: what application should we use?
-* DECISION: ~~multi-service via supervisord? something else?~~
-* DECISION: Can we pre-cache at least the base images? **Yes**
-* NOTE: would prefer to use the "docker-artifacts" style of Dockerfile content (to not muddy the app)
 
