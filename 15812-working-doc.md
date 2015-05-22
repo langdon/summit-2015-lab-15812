@@ -10,10 +10,11 @@
 ## Table of Contents
 
 1. Slides
-1. **LAB 1** Docker refresh
-1. **LAB 2** Analyzing a monolithic application
-1. **LAB 3** Deconstructing an application into microservices
-1. **LAB 4** Orchestrated deployment of a decomposed application
+1. **[LAB 1](labs/chapter1.md)** Docker refresh
+1. **[LAB 2](labs/chapter2.md)** Analyzing a monolithic application
+1. **[LAB 3](labs/chapter3.md)** Deconstructing an application into microservices
+1. **[LAB 4](labs/chapter4.md)** Orchestrated deployment of a decomposed application
+1. **[LAB 5](labs/chapter5.md)** Packaging an orchestrated application
 
 ## Abstract (Langdon)
 
@@ -34,6 +35,7 @@ We will also cover how you might start a containerized application. However, tha
 
 ##Before you begin...
 We will be providing computers for this lab, to ensure we don't lose time on "setup." However, if you have experience with Vagrant and RHEL Atomic Host, you should be able to follow along pretty easily with your own computer. If you do choose to use your own, please come in to the lab with a vagrant deployed instance of RHEL Atomic Host that has Docker running.
+
 
 ### Application as single service containers
 
