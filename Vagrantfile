@@ -25,7 +25,7 @@ Vagrant.configure(2) do |config|
 	host.vm.provision 'shell', inline: "echo 'TODO: start docker registry'"
 
   end
-  config.vm.box = "rhel-7.1"
+  config.vm.box = "rhel-server-7"
   config.vm.define :summit_rhel_dev do | host |
     host.vm.hostname = "summit-rhel-dev"
     host.vm.synced_folder ".", "/vagrant", disabled: true
