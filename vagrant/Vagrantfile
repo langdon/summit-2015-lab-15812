@@ -41,6 +41,7 @@ Vagrant.configure(2) do |config|
     host.vm.provision 'shell', inline: "sudo usermod -a -G docker vagrant"
     host.vm.provision 'shell', inline: "sudo systemctl enable docker && sudo systemctl start docker"
     host.vm.provision 'shell', inline: "sudo chown root:docker /var/run/docker.sock"
+    host.vm.provision 'shell', inline: "sudo cp local.repo /etc/yum.repos.d && yum clean all && yum repolist"
 
     #setup kubernetes
 	host.vm.provision 'shell', inline: "echo 'TODO: do some kubernetes setup here'"
