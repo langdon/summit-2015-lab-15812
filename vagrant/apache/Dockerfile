@@ -3,9 +3,8 @@ MAINTAINER Student <student@foo.io>
 
 ADD ./local.repo /etc/yum.repos.d/local.repo
 ADD ./hosts /new-hosts
-RUN cat /new-hosts >> /etc/hosts
-RUN yum -y update && yum clean all
-RUN yum -y install httpd && yum clean all
+RUN cat /new-hosts >> /etc/hosts && yum -y update && yum clean all
+RUN cat /new-hosts >> /etc/hosts && yum -y install httpd && yum clean all
 RUN echo "Apache" >> /var/www/html/index.html
 
 EXPOSE 80
@@ -15,4 +14,3 @@ ADD run-apache.sh /run-apache.sh
 RUN chmod -v +x /run-apache.sh
 
 CMD ["/run-apache.sh"]
-

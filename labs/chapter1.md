@@ -35,19 +35,121 @@ In this lab we will explore the docker environment. If you are familiar with doc
 # docker info
 ```
 
+* Take a look at the Docker images on the system.  These images have been cached here ahead of time. You should see some RHEL images and some CentOS images.
+  
+```
+# docker images
+```
+
 ###Let's explore a Dockerfile
 
-Here we are just going to explore a simple Dockerfile.  The purpose for this is to have a look at some of the basic commands that are used to construct a Docker image.
+Here we are just going to explore a simple Dockerfile.  The purpose for this is to have a look at some of the basic commands that are used to construct a Docker image.  For this lab, we will explore a basic Apache Dockerfile.
+
+* As root, change directory to *~/Dockerfiles/apache* and *cat* out the Dockerfile
+
+```
+# cd ~/Dockerfiles/apache
+# cat Dockerfile
+FROM registry.access.redhat.com/rhel:7.1-6
+MAINTAINER Student <student@foo.io>
+
+ADD ./local.repo /etc/yum.repos.d/local.repo
+RUN yum -y update && yum clean all
+RUN yum -y install httpd && yum clean all
+RUN echo "Apache" >> /var/www/html/index.html
+
+EXPOSE 80
+
+# Simple startup script to avoid some issues observed with container restart 
+ADD run-apache.sh /run-apache.sh
+RUN chmod -v +x /run-apache.sh
+
+CMD ["/run-apache.sh"]
+```
+
+Here you can see in the *FROM* command that we are pulling a RHEL 7.1 base image that we are going to install Docker on.  We are also using a local yum repo.  We are doing this because we are in a disconnected environment.  However, the way RHEL images normally get access to content is by inheriting the subscriptions that are on the host they are running on.  Next we update the container and install *httpd*.  Finally, we modify the index.html file, *EXPOSE* port 80 which allows traffic into the container and start the container with a a *CMD* of *run-apache.sh".  
 
 
+## Build an Image
+
+* Now that we have taken a look at the Dockerfile, let's build this image.
+
+```
+# docker build -t redhat/apache .
+```
+
+## Run the Container
 
 
+* Next, let's run the image and make sure it started.
+
+```
+# docker run -dt -p 80:80 redhat/apache
+# docker ps
+```
+
+Here we are using a few switches to configure the running container the way we want it.  We are running a *-dt* to run in detached mode with a psuedo TTY.  Next we are mapping a port from the host to the contianer.  We are being explicit here.  We are telling Docker to map port 80 on the host to port 80 in the container.  Now, we could have let Docker handle the host side port mapping dynamically by passing a *-p 80*, in which case Docker would have randomly assigned a port to the container.  You can find that by doing a *docker ps* and see what port got assigned.  Finally we passed in the name of the image that we built earlier.
 
 
+* OKay, let's make sure we can access the web server.
+
+```
+# curl http://localhost
+Apache
+```
+
+* Now that we have built an image, launched a container and confirmed that it is running, lets do some further inspection of the container.  We should take a look at the container IP address.  Let's use *docker inspect* to do that.
+
+## Time to Inspect
+
+```
+# docker inspect <container id>
+```
+
+We can see that this gives us quite a bit of information in json format.  We can scroll around and find the IP address, it will be towards the bottom.  
+
+* Let's be more explicit with our *docker inspect*
+
+```
+# docker inspect --format '{{ .NetworkSettings.IPAddress }}' <container id>
+172.17.0.6
+```
+
+We can apply the same filter to any value in the json output.  Try a few different ones.
+
+* Now lets look inside the container and see what that environment looks like.  We first need to get the PID of the container so we can attach to the PID namespace with nsenter.  After we have the PID, go ahead and enter the namespaces of the container.  Take a look at the man page to understand all the flags we are passing to nsenter.
+
+```
+# docker inspect --format '{{ .State.Pid }}' 04d4d9ef5c4a
+15492
+
+# man nsenter
+# nsenter -m -u -n -i -p -t 15492
+
+```
+
+* Now run some commands and explore the environment.  Remember, we are in a slimmed down container at this point - this is by design.  You may find yourself restricted.
 
 
+```
+# ps aux
+# ip a
+# ifconfig
+# ls /bin
+# cat /etc/hosts
+```
 
+Well, what can we do?  You can install software into this container.
 
+```
+# yum -y install iproute
+# ip a
+```
 
+In addition to using nsenter to enter the namespace of your container, you can also execute commands in that namespace with *docker exec*.  
 
+```
+docker exec <container id> pwd
+```
 
+Whew, so we do have some options.  Now, remember that this lab is all about containerizing your existing apps.  You will need some of the tools listed above to go through the process of containerizing your apps. Troubleshooting problems when you are in a container is going to be something that you get very familiar with.
