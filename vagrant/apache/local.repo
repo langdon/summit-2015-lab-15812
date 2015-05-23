@@ -1,5 +1,5 @@
 [rhel-x86_64-server-7]
-baseurl = http://10.19.136.142/packages/rhel-x86_64-server-7/
+baseurl = http://content.server.lcl/packages/rhel-x86_64-server-7/
 sslverify = 0
 name = Red Hat Enterprise Linux Server (v. 7 for 64-bit x86_64)
 enabled = 1

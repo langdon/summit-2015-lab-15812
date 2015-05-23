@@ -1,63 +1,64 @@
 Vagrant.configure(2) do |config|
-  config.vm.box = "rhel-atomic-host"
-  config.vm.define :summit_rhel_deploy_target do | host |
-    host.vm.hostname = "summit-rhel-deploy-target"
-    host.vm.synced_folder ".", "/vagrant", disabled: true
-    host.vm.synced_folder ".", "/home/vagrant/sync", type: "rsync",
+  config.vm.define :summit_rhel_deploy_target do | summit_rhel_deploy_target |
+    summit_rhel_deploy_target.vm.box = "rhel-atomic-host"
+    summit_rhel_deploy_target.vm.hostname = "summit-rhel-deploy-target"
+    summit_rhel_deploy_target.vm.synced_folder ".", "/vagrant", disabled: true
+    summit_rhel_deploy_target.vm.synced_folder ".", "/home/vagrant/sync", type: "rsync",
                           rsync__exclude: [ ".git/", ".#*", "*~" ]
 
+    #move files to the right dirs, this handles the sorta-local repo
+    summit_rhel_deploy_target.vm.provision 'shell', inline: "sudo mv /home/vagrant/sync/local.repo /etc/yum.repos.d/
+    summit_rhel_deploy_target.vm.provision 'shell', inline: "sudo cat /home/vagrant/sync/hosts >> /etc/hosts
+    summit_rhel_deploy_target.vm.provision 'shell', inline: "sudo yum clean all && sudo yum repolist"
+
     #ensure docker is configured correctly to be run by vagrant user
-    host.vm.provision 'shell', inline: "sudo systemctl stop docker > /dev/null 2>&1 || :" #in case this isn't first run
-    host.vm.provision 'shell', inline: "sudo groupadd docker > /dev/null 2>&1 || :"
-    host.vm.provision 'shell', inline: "sudo usermod -a -G docker vagrant"
-    host.vm.provision 'shell', inline: "sudo systemctl enable docker && sudo systemctl start docker"
-    host.vm.provision 'shell', inline: "sudo chown root:docker /var/run/docker.sock"
+    summit_rhel_deploy_target.vm.provision 'shell', inline: "sudo systemctl stop docker > /dev/null 2>&1 || :" #in case this isn't first run
+    summit_rhel_deploy_target.vm.provision 'shell', inline: "sudo groupadd docker > /dev/null 2>&1 || :"
+    summit_rhel_deploy_target.vm.provision 'shell', inline: "sudo usermod -a -G docker vagrant"
+    summit_rhel_deploy_target.vm.provision 'shell', inline: "sudo systemctl enable docker && sudo systemctl start docker"
+    summit_rhel_deploy_target.vm.provision 'shell', inline: "sudo chown root:docker /var/run/docker.sock"
 
     #setup kubernetes
-	host.vm.provision 'shell', inline: "echo 'TODO: do some kubernetes setup here'"
+    summit_rhel_deploy_target.vm.provision 'shell', inline: "echo 'TODO: do some kubernetes setup here'"
 
-	#pre-cache docker images
-    host.vm.provision 'shell', inline: "docker pull rhel"
-    host.vm.provision 'shell', inline: "docker pull centos"
-    host.vm.provision 'shell', inline: "docker pull registry"
+    #pre-cache docker images
+    summit_rhel_deploy_target.vm.provision 'shell', inline: "docker pull rhel"
+    summit_rhel_deploy_target.vm.provision 'shell', inline: "docker pull centos"
+    summit_rhel_deploy_target.vm.provision 'shell', inline: "docker pull registry"
 
     #start docker registry
-	host.vm.provision 'shell', inline: "echo 'TODO: start docker registry'"
+    summit_rhel_deploy_target.vm.provision 'shell', inline: "echo 'TODO: start docker registry'"
 
   end
-  config.vm.box = "rhel-server-7"
-  config.vm.define :summit_rhel_dev do | host |
-    host.vm.hostname = "summit-rhel-dev"
-    host.vm.synced_folder ".", "/vagrant", disabled: true
-    host.vm.synced_folder ".", "/home/vagrant/sync", type: "rsync",
-                          rsync__exclude: [ ".git/", ".#*", "*~" ]
+  config.vm.define :summit_rhel_dev do | summit_rhel_dev |
+    summit_rhel_dev.vm.box = "rhel-server-7"
+    summit_rhel_dev.vm.hostname = "summit-rhel-dev"
+    summit_rhel_dev.vm.synced_folder ".", "/vagrant", disabled: true
+    summit_rhel_dev.vm.synced_folder ".", "/home/vagrant/sync", type: "rsync",
+                        rsync__exclude: [ ".git/", ".#*", "*~" ]
 
-    #setup a local repo, unecessary if using this outside the lab environment
-	host.vm.provision 'shell', inline: "echo 'TODO: do some stuff here, likely need RHEL-main, RHEL-Extras, RHEL-Optional?'"
+    #move files to the right dirs, this handles the sorta-local repo
+    summit_rhel_dev.vm.provision 'shell', inline: "sudo mv /home/vagrant/sync/local.repo /etc/yum.repos.d/
+    summit_rhel_dev.vm.provision 'shell', inline: "sudo cat /home/vagrant/sync/hosts >> /etc/hosts
+    summit_rhel_dev.vm.provision 'shell', inline: "sudo yum clean all && sudo yum repolist"
 
     #ensure docker is configured correctly to be run by vagrant user
-    host.vm.provision 'shell', inline: "sudo systemctl stop docker > /dev/null 2>&1 || :" #in case this isn't first run
-    host.vm.provision 'shell', inline: "sudo groupadd docker > /dev/null 2>&1 || :"
-    host.vm.provision 'shell', inline: "sudo usermod -a -G docker vagrant"
-    host.vm.provision 'shell', inline: "sudo systemctl enable docker && sudo systemctl start docker"
-    host.vm.provision 'shell', inline: "sudo chown root:docker /var/run/docker.sock"
+    summit_rhel_dev.vm.provision 'shell', inline: "sudo systemctl stop docker > /dev/null 2>&1 || :" #in case this isn't first run
+    summit_rhel_dev.vm.provision 'shell', inline: "sudo groupadd docker > /dev/null 2>&1 || :"
+    summit_rhel_dev.vm.provision 'shell', inline: "sudo usermod -a -G docker vagrant"
+    summit_rhel_dev.vm.provision 'shell', inline: "sudo systemctl enable docker && sudo systemctl start docker"
+    summit_rhel_dev.vm.provision 'shell', inline: "sudo chown root:docker /var/run/docker.sock"
 
     #setup kubernetes
-	host.vm.provision 'shell', inline: "echo 'TODO: do some kubernetes setup here'"
+    summit_rhel_dev.vm.provision 'shell', inline: "echo 'TODO: do some kubernetes setup here'"
 
-    #setup repos
-    host.vm.provision 'shell', inline: "sudo cp /home/vagrant/sync/local.repo /etc/yum.repos.d && yum clean all && yum repolist"
-
-    #setup for lab1
-    host.vm.provision 'shell', inline: "sudo mkdir /root/Dockerfiles && cp -Rv /home/vagrant/sync/apache /root/Dockerfiles"
-
-	#pre-cache docker images
-    host.vm.provision 'shell', inline: "docker pull rhel"
-    host.vm.provision 'shell', inline: "docker pull centos"
-    host.vm.provision 'shell', inline: "docker pull registry"
+    #pre-cache docker images
+    summit_rhel_dev.vm.provision 'shell', inline: "docker pull rhel"
+    summit_rhel_dev.vm.provision 'shell', inline: "docker pull centos"
+    summit_rhel_dev.vm.provision 'shell', inline: "docker pull registry"
 
     #get latest lab files from remote 
-	host.vm.provision 'shell', inline: "echo 'TODO: get the latest lab files'"
+    summit_rhel_dev.vm.provision 'shell', inline: "echo 'TODO: get the latest lab files'"
 
   end
 end
