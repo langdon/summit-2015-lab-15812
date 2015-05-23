@@ -49,7 +49,7 @@ Vagrant.configure(2) do |config|
     host.vm.provision 'shell', inline: "sudo cp /home/vagrant/sync/local.repo /etc/yum.repos.d && yum clean all && yum repolist"
 
     #setup for lab1
-    host.vm.provision 'shell', inline: "sudo /root/Dockerfiles && cp -Rv /home/vagrant/sync/apache /root/Dockerfiles"
+    host.vm.provision 'shell', inline: "sudo mkdir /root/Dockerfiles && cp -Rv /home/vagrant/sync/apache /root/Dockerfiles"
 
 	#pre-cache docker images
     host.vm.provision 'shell', inline: "docker pull rhel"
