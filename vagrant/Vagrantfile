@@ -59,8 +59,8 @@ Vagrant.configure(2) do |config|
     #setup kubernetes
     summit_rhel_dev.vm.provision 'shell', inline: "echo 'TODO: do some kubernetes setup here'"
 
-    setup for lab1
-    host.vm.provision 'shell', inline: "sudo mkdir -vp /root/Dockerfiles && cp -Rv /home/vagrant/sync/apache /root/Dockerfiles"
+    # setup for lab1
+    summit_rhel_dev.vm.provision 'shell', inline: "sudo mkdir -vp /root/Dockerfiles && cp -Rv /home/vagrant/sync/apache /root/Dockerfiles"
 
     #pre-cache docker images
     summit_rhel_dev.vm.provision 'shell', inline: "docker pull rhel"
