@@ -1,6 +1,6 @@
 Vagrant.configure(2) do |config|
   config.vm.define :summit_rhel_deploy_target do | summit_rhel_deploy_target |
-    summit_rhel_deploy_target.vm.box = "rhel-atomic-host"
+    summit_rhel_deploy_target.vm.box = "rhel-atomic-7"
     summit_rhel_deploy_target.vm.hostname = "summit-rhel-deploy-target"
     summit_rhel_deploy_target.vm.synced_folder ".", "/vagrant", disabled: true
     summit_rhel_deploy_target.vm.synced_folder ".", "/home/vagrant/sync", type: "rsync",
