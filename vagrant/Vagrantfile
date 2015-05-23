@@ -48,15 +48,12 @@ Vagrant.configure(2) do |config|
     summit_rhel_dev.vm.synced_folder ".", "/home/vagrant/sync", type: "rsync",
                         rsync__exclude: [ ".git/", ".#*", "*~" ]
 
+    # we don't need to register this VM (going to use custom repos)
+    if Vagrant.has_plugin?('vagrant-registration')
+      summit_rhel_dev.registration.skip = true
+    end
+
     #move files to the right dirs, this handles the sorta-local repo
-    #this isn't gonna work if the vm is registered, sub-mgr stomps all over repos.d unless you use it to disable things
-    #probably should just not register the machine.
-    #this isn't enough to get vagrant to ignore it, be sure to remove any vagrant-reg options and decline to register
-    #begin #need to not error if vagrant-registration is not installed
-    #    config.registration.skip = true
-    #rescue
-        #meh
-    #end
     summit_rhel_dev.vm.provision 'shell', inline: "sudo rm -rf /etc/yum.repos.d/* && " \
                                                   "sudo mv /home/vagrant/sync/local.repo /etc/yum.repos.d/"
     summit_rhel_dev.vm.provision 'shell', inline: "sudo cat /home/vagrant/sync/hosts >> /etc/hosts"
