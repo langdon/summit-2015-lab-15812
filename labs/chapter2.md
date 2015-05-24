@@ -5,11 +5,12 @@ several different applications. We will also observe several bad
 practices when composing Dockerfiles and explore how to avoid those
 mistakes.
 
-Expected completion: 20 minutes
+Expected completion: 20-25 minutes
 
 * overview of monolithic application
 * build docker image
 * run container based on docker image
+* exploring the running container
 * connecting to the application
 * review Dockerfile practices
 
@@ -46,6 +47,29 @@ following command:
 ```
 docker run -p 80 --name=bigapp -e DBUSER=user -e DBPASS=mypassword -e DBNAME=mydb -d monolithic
 ```
+
+### Exploring the Running Container
+
+Now that the container is running we will explore the running
+container to see what's going on inside. First off the processes were
+started and any output that goes to stdout will come to the console of
+the container. You can run `docker logs` to see the output:
+
+```
+docker logs bigapp
+```
+
+If you need to inspect more than just the stderr/stdout of the machine
+then you can enter into the namespaces of the container to insepct
+things closer. The easiest way to do this is to use `docker exec`
+
+```
+docker exec -it bigapp /bin/bash
+pstree
+cat /var/www/html/wp-config.php | grep '=='
+tail -f /var/log/httpd/access_log /var/log/httpd/error_log /var/log/mariadb/mariadb.log
+```
+
 
 ### Connecting to the Application
 
