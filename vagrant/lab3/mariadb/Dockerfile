@@ -4,7 +4,6 @@ MAINTAINER Student <student@foo.io>
 # Add in custom yum repository and update
 ADD ./local.repo /etc/yum.repos.d/local.repo
 ADD ./hosts /new-hosts
-RUN cat /new-hosts >> /etc/hosts && yum -y update && yum clean all
 
 # Deps for mariadb
 RUN cat /new-hosts >> /etc/hosts && \
