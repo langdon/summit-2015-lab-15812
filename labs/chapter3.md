@@ -108,6 +108,50 @@ Save the file and exit the editor.
 
 #### Wordpress Dockerfile
 
+Now we'll create the Wordpress Dockerfile.
+
+1. Change to the `wordpress` directory. In a text editor create a file named `Dockerfile`.
+1. Add a `FROM` line that uses a specific image tag. Also add `MAINTAINER` information.
+
+        FROM registry.access.redhat.com/rhel:7.1-6
+        MAINTAINER Student <student@foo.io>
+
+1. Add local files for this lab environment. This is only required for this lab.
+
+        ADD ./local.repo /etc/yum.repos.d/local.repo
+        ADD ./hosts /new-hosts
+
+1. Add the required packages. We'll include `yum clean all` at the end to clear the yum cache.
+
+        RUN cat /new-hosts >> /etc/hosts && \
+            yum -y install httpd php php-mysql php-gd openssl psmisc tar && \
+            yum clean all
+
+1. Add the dependent scripts and make them executable.
+
+        ADD scripts /scripts
+        RUN chmod 755 /scripts/*
+
+1. Add the Wordpress source from gzip tar file. Docker will extract the files.
+        ADD latest.tar.gz /var/www/html
+        RUN chown -R apache:apache /var/www/
+
+1. Add an instruction to expose the web server port.
+
+        EXPOSE 80
+
+1. Add a `VOLUME` instruction for `/var/www/html`.
+
+        VOLUME /var/www/html
+
+1. Add a `LABEL` instruction to prescribe how the image is to be run. This may be used by the `atomic` CLI to run the image reliably.
+
+        LABEL RUN docker run -d --rm -v ${HOME}/wordpress:/var/www/html -p 80:80 --link=mariadb:db --name NAME -e NAME=NAME -e IMAGE=IMAGE IMAGE
+
+1. Finish by adding the `CMD` instruction.
+
+        CMD ["/bin/bash", "/scripts/start.sh"]
+
 
 ### Build Images and Test
 
