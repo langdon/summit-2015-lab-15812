@@ -109,15 +109,31 @@ Save the file and exit the editor.
 #### Wordpress Dockerfile
 
 
-### Build Images and Push to local registry
+### Build Images and Test
 
-Build
+Build the images
 ```
 docker build -t <hostname_lab_dev_vm>/mariadb .
 docker build -t <hostname_lab_dev_vm>/wordpress .
 ```
 
-Push
+Test the database image to confirm connectivity.
+
+```
+atomic run <hostname_lab_dev_vm>/mariadb
+docker logs $(docker ps -ql)
+curl http://localhost:3306
+```
+
+Test the Wordpress image to confirm connectivity.
+
+```
+atomic run <hostname_lab_dev_vm>/wordpress
+docker logs $(docker ps -ql)
+curl http://localhost
+```
+
+### Push the Images to Local Registry
 ```
 docker push <hostname_lab_dev_vm>/mariadb
 docker push <hostname_lab_dev_vm>/wordpress
