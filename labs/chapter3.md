@@ -37,6 +37,7 @@ This shows port 3306 is used.
 #### Storage
 
 **Web server**
+
 The Wordpress tar file was extracted into `/var/www/html`. List the files.
 
 ```
@@ -68,30 +69,32 @@ $ ls -lR
 1. Change to the `mariadb` directory. In a text editor create a file named `Dockerfile`.
 1. Add a `FROM` line that uses a specific image tag. Also add `MAINTAINER` information.
 
-	FROM registry.access.redhat.com/rhel:7.1-6
-	MAINTAINER Student <student@foo.io>
+        FROM registry.access.redhat.com/rhel:7.1-6
+        MAINTAINER Student <student@foo.io>
 
 1. Add local files for this lab environment. This is only required for this lab.
 
-	ADD ./local.repo /etc/yum.repos.d/local.repo
-	ADD ./hosts /new-hosts
+        ADD ./local.repo /etc/yum.repos.d/local.repo
+        ADD ./hosts /new-hosts
 
 1. Add the required packages. We'll include `yum clean all` at the end to clear the yum cache.
 
-	RUN cat /new-hosts >> /etc/hosts && \
-	    yum -y install mariadb-server openssl psmisc net-tools hostname && \
-	    yum clean all
+        RUN cat /new-hosts >> /etc/hosts && \
+            yum -y install mariadb-server openssl psmisc net-tools hostname && \
+            yum clean all
 
 1. Add the dependent scripts and make them executable.
 
-	ADD scripts /scripts
-	RUN chmod 755 /scripts/*
+        ADD scripts /scripts
+        RUN chmod 755 /scripts/*
 
 1. Add an instruction to expose the database port.
 
-	EXPOSE 3306
+        EXPOSE 3306
 
-1. Add a `VOLUME` instruction.
+1. Add a `VOLUME` instruction for `/var/lib/mysql`.
+
+        VOLUME /var/lib/mysql
 
 1. Add a `LABEL` instruction to prescribe how the image is to be run. This may be used by the `atomic` CLI to run the image reliably.
 
@@ -99,8 +102,23 @@ $ ls -lR
 
 1. Finish by adding the `CMD` instruction.
 
-	CMD ["/bin/bash", "/scripts/start.sh"]
+        CMD ["/bin/bash", "/scripts/start.sh"]
 
 Save the file and exit the editor.
 
 #### Wordpress Dockerfile
+
+
+### Build Images and Push to local registry
+
+Build
+```
+docker build -t <hostname_lab_dev_vm>/mariadb .
+docker build -t <hostname_lab_dev_vm>/wordpress .
+```
+
+Push
+```
+docker push <hostname_lab_dev_vm>/mariadb
+docker push <hostname_lab_dev_vm>/wordpress
+```
