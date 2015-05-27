@@ -146,6 +146,8 @@ Well, what can we do?  You can install software into this container.
 # ip a
 ```
 
+Exit the container namespace with `CTRL+d` or `exit`.
+
 In addition to using nsenter to enter the namespace of your container, you can also execute commands in that namespace with *docker exec*.  
 
 ```
