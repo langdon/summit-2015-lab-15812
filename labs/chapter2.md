@@ -1,7 +1,7 @@
 ## LAB 2: Analyzing a Monolithic Application (Dusty)
 
-In this lab we will create a monolithic container image comprised of
-several different applications. We will also observe several bad
+In this lab we will create a monolithic, all-in-one container image 
+comprised of multiple services. We will also observe several bad
 practices when composing Dockerfiles and explore how to avoid those
 mistakes.
 
@@ -53,7 +53,7 @@ docker run -p 80 --name=bigapp -e DBUSER=user -e DBPASS=mypassword -e DBNAME=myd
 Now that the container is running we will explore the running
 container to see what's going on inside. First off the processes were
 started and any output that goes to stdout will come to the console of
-the container. You can run `docker logs` to see the output:
+the container. You can run `docker logs` to see the output. To follow or "tail" the logs use the `-f` option.
 
 ```
 docker logs bigapp
@@ -70,6 +70,7 @@ cat /var/www/html/wp-config.php | grep '=='
 tail -f /var/log/httpd/access_log /var/log/httpd/error_log /var/log/mariadb/mariadb.log
 ```
 
+Press `CTRL+d` or type `exit` to exit the container shell.
 
 ### Connecting to the Application
 
@@ -88,12 +89,12 @@ So we have built a monolithic application using a somewhat complicated
 Dockerfile. There are a few principles that are good to follow when creating 
 a Dockerfile that we did not follow for this monolithic app:
 
-* Be specific about source image
-  * Updates could break things
-* Place rarely changing statements towards the top of the file
-  * This allows the re-use of cached images when rebuilding
-* Group statements with same goal into multiline statements
-  * Can help avoid layers that have files needed only for build
+* Use a specific tag for the source image. Image updates may break things.
+* Place rarely changing statements towards the top of the file. This allows the re-use of cached image layers when rebuilding.
+* Group statements into multiline statements. This avoids layers that have files needed only for build.
+* Use `LABEL RUN` instruction to prescribe how the image is to be run.
+* Avoid running application as root user.
+* Use `VOLUME` instruction to create a host mount point for persistent storage.
 
 To illustrate some problem points in our Dockerfile it has been 
 replicated below with some commentary added:
@@ -117,8 +118,8 @@ ADD ./local.repo /etc/yum.repos.d/local.repo
 ADD ./hosts /new-hosts
 RUN cat /new-hosts >> /etc/hosts && yum -y update
 
->>> Running a yum clean all in the same statement would mean that we
->>> wouldn't have junk in our intermediate cached image
+>>> Running a yum clean all in the same statement would clear the yum
+>>> cache in our intermediate cached image layer
 
 # Common Deps
 RUN cat /new-hosts >> /etc/hosts && yum -y install openssl
@@ -141,6 +142,9 @@ RUN cat /new-hosts >> /etc/hosts && yum -y install hostname
 
 # Add in wordpress sources 
 COPY latest.tar.gz /latest.tar.gz
+
+>>> Consider using a specific version of Wordpress to control the installed version
+
 RUN tar xvzf /latest.tar.gz -C /var/www/html --strip-components=1 
 RUN rm /latest.tar.gz
 RUN chown -R apache:apache /var/www/
@@ -152,3 +156,5 @@ RUN chown -R apache:apache /var/www/
 EXPOSE 80
 CMD ["/bin/bash", "/scripts/start.sh"]
 ```
+
+In the next lab we will fix these issues and break the application up into separate services.
