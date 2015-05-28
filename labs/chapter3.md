@@ -178,27 +178,27 @@ Now we are ready to build the images to test our Dockerfiles.
   * `-v <host/path>:<container/path>` to bindmount the directory for persistent storage
   * `-p <host_port>:<container_port>` to map the container port to the host port
 
-        docker run -d -p 3306:3306 -e DBUSER=user -e DBPASS=mypassword -e DBNAME=mydb --name mariadb mariadb
-        docker logs $(docker ps -ql)
-        curl http://localhost:3306
+            docker run -d -p 3306:3306 -e DBUSER=user -e DBPASS=mypassword -e DBNAME=mydb --name mariadb mariadb
+            docker logs $(docker ps -ql)
+            curl http://localhost:3306
 
   **Note**: the `curl` command does not return useful information but demonstrates a response on the port.
 
 1. Test the Wordpress image to confirm connectivity.
   * `--link <name>:<alias>` to link to the database container
 
-        atomic run -d -p 80:80 --link mariadb:mariadb wordpress
-        docker logs $(docker ps -ql)
-        curl http://localhost
+            atomic run -d -p 80:80 --link mariadb:mariadb wordpress
+            docker logs $(docker ps -ql)
+            curl http://localhost
 
 1. When we have a working `docker run` recipe add a `LABEL RUN` instruction to each Dockerfile to prescribe how the image is to be run. This instruction will be used by the `atomic` CLI to run the image reliably. The environment variables `NAME` and `IMAGE` are used by atomic CLI
   * MariaDB
 
-        LABEL RUN docker run -d -v ${HOME}/mysql:/var/lib/mysql  --name NAME -e DBUSER=${DBUSER} -e DBPASS={$DBPASS} -e DBNAME=${DBNAME} -e NAME=NAME -e IMAGE=IMAGE IMAGE
+            LABEL RUN docker run -d -v ${HOME}/mysql:/var/lib/mysql  --name NAME -e DBUSER=${DBUSER} -e DBPASS={$DBPASS} -e DBNAME=${DBNAME} -e NAME=NAME -e IMAGE=IMAGE IMAGE
 
   * Wordpress
 
-        LABEL RUN docker run -d -v ${HOME}/wordpress:/var/www/html -p 80:80 --link=mariadb:db --name NAME -e NAME=NAME -e IMAGE=IMAGE IMAGE
+            LABEL RUN docker run -d -v ${HOME}/wordpress:/var/www/html -p 80:80 --link=mariadb:db --name NAME -e NAME=NAME -e IMAGE=IMAGE IMAGE
 
 1. Rebuild the images. The image cache will be used so only the changes will need to be built.
 
