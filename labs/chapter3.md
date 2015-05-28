@@ -184,10 +184,10 @@ Now we are ready to build the images to test our Dockerfiles.
 
   **Note**: the `curl` command does not return useful information but demonstrates a response on the port.
 
-1. Test the Wordpress image to confirm connectivity.
+1. Test the Wordpress image to confirm connectivity. Additional run options:
   * `--link <name>:<alias>` to link to the database container
 
-            atomic run -d -p 80:80 --link mariadb:mariadb wordpress
+            docker run -d -p 80:80 --link mariadb:db wordpress
             docker logs $(docker ps -ql)
             curl http://localhost
 
@@ -220,3 +220,24 @@ Now we are ready to build the images to test our Dockerfiles.
 
         docker push <hostname_lab_dev_vm>/mariadb
         docker push <hostname_lab_dev_vm>/wordpress
+
+### Clean Up
+
+Stop the mariadb and wordpress containers.
+
+```
+docker ps
+docker stop <wp_container_id> <db_container_id>
+```
+
+After iterating through running docker images you will likely end up with many stopped containers. List them.
+
+```
+docker ps -a
+```
+
+This command is useful in freeing up disk space by removing all stopped containers.
+
+```
+docker rm $(docker ps -qa)
+```
