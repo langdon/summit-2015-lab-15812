@@ -56,7 +56,14 @@ grep databases /var/log/mariadb/mariadb.log
 
 The `/var/lib/mysql` should also be mounted to persistent storage on the host.
 
-### Create images
+Once we've inspected the container stop and remove it. `docker ps -ql` prints the ID of the latest created container.
+
+```
+docker stop $(docker ps -ql)
+docker rm $(docker ps -ql)
+```
+
+### Create the Dockerfiles
 
 Now we will develop the two images. Using the information above and the Dockerfile from Lab 2 as a guide we will create Dockerfiles for each service. For this lab we have created a directory for each service with the required files for the service.
 
@@ -66,7 +73,10 @@ $ ls -lR
 
 #### MariaDB Dockerfile
 
-1. Change to the `mariadb` directory. In a text editor create a file named `Dockerfile`.
+1. In a text editor create a file named `Dockerfile` in the `mariadb` directory.
+
+        vi mariadb/Dockerfile
+
 1. Add a `FROM` line that uses a specific image tag. Also add `MAINTAINER` information.
 
         FROM registry.access.redhat.com/rhel:7.1-6
@@ -96,10 +106,6 @@ $ ls -lR
 
         VOLUME /var/lib/mysql
 
-1. Add a `LABEL` instruction to prescribe how the image is to be run. This may be used by the `atomic` CLI to run the image reliably.
-
-        LABEL RUN docker run -d --rm -v ${HOME}/mysql:/var/lib/mysql  --name NAME -e DBUSER=${DBUSER} -e DBPASS={$DBPASS} -e DBNAME=${DBNAME} -e NAME=NAME -e IMAGE=IMAGE IMAGE
-
 1. Finish by adding the `CMD` instruction.
 
         CMD ["/bin/bash", "/scripts/start.sh"]
@@ -110,7 +116,10 @@ Save the file and exit the editor.
 
 Now we'll create the Wordpress Dockerfile.
 
-1. Change to the `wordpress` directory. In a text editor create a file named `Dockerfile`.
+1. Using a text editor create a file named `Dockerfile` in the `wordpress` directory.
+
+        vi wordpress/Dockerfile
+
 1. Add a `FROM` line that uses a specific image tag. Also add `MAINTAINER` information.
 
         FROM registry.access.redhat.com/rhel:7.1-6
@@ -133,6 +142,7 @@ Now we'll create the Wordpress Dockerfile.
         RUN chmod 755 /scripts/*
 
 1. Add the Wordpress source from gzip tar file. Docker will extract the files.
+
         ADD latest.tar.gz /var/www/html
         RUN chown -R apache:apache /var/www/
 
@@ -144,41 +154,69 @@ Now we'll create the Wordpress Dockerfile.
 
         VOLUME /var/www/html
 
-1. Add a `LABEL` instruction to prescribe how the image is to be run. This may be used by the `atomic` CLI to run the image reliably.
-
-        LABEL RUN docker run -d --rm -v ${HOME}/wordpress:/var/www/html -p 80:80 --link=mariadb:db --name NAME -e NAME=NAME -e IMAGE=IMAGE IMAGE
-
 1. Finish by adding the `CMD` instruction.
 
         CMD ["/bin/bash", "/scripts/start.sh"]
 
+Save the Dockerfile and exit the editor.
 
-### Build Images and Test
+### Build Images, Test and Push
 
-Build the images
-```
-docker build -t <hostname_lab_dev_vm>/mariadb .
-docker build -t <hostname_lab_dev_vm>/wordpress .
-```
+Now we are ready to build the images to test our Dockerfiles.
 
-Test the database image to confirm connectivity.
+1. Build each image. When building an image docker requires the path to the directory of the Dockerfile.
 
-```
-atomic run <hostname_lab_dev_vm>/mariadb
-docker logs $(docker ps -ql)
-curl http://localhost:3306
-```
+        docker build -t mariadb mariadb/
+        docker build -t wordpress wordpress/
 
-Test the Wordpress image to confirm connectivity.
+1. If the build does not return `Successfully built <image_id>` the resolve the issue and build again. Once successful, list the images.
 
-```
-atomic run <hostname_lab_dev_vm>/wordpress
-docker logs $(docker ps -ql)
-curl http://localhost
-```
+        docker images
 
-### Push the Images to Local Registry
-```
-docker push <hostname_lab_dev_vm>/mariadb
-docker push <hostname_lab_dev_vm>/wordpress
-```
+1. Run the database image to confirm connectivity. It takes some time to discover all of the necessary `docker run` options.
+  * `-d` to run in daemonized mode
+  * `-v <host/path>:<container/path>` to bindmount the directory for persistent storage
+  * `-p <host_port>:<container_port>` to map the container port to the host port
+
+        docker run -d -p 3306:3306 -e DBUSER=user -e DBPASS=mypassword -e DBNAME=mydb --name mariadb mariadb
+        docker logs $(docker ps -ql)
+        curl http://localhost:3306
+
+  **Note**: the `curl` command does not return useful information but demonstrates a response on the port.
+
+1. Test the Wordpress image to confirm connectivity.
+  * `--link <name>:<alias>` to link to the database container
+
+        atomic run -d -p 80:80 --link mariadb:mariadb wordpress
+        docker logs $(docker ps -ql)
+        curl http://localhost
+
+1. When we have a working `docker run` recipe add a `LABEL RUN` instruction to each Dockerfile to prescribe how the image is to be run. This instruction will be used by the `atomic` CLI to run the image reliably. The environment variables `NAME` and `IMAGE` are used by atomic CLI
+  * MariaDB
+
+        LABEL RUN docker run -d -v ${HOME}/mysql:/var/lib/mysql  --name NAME -e DBUSER=${DBUSER} -e DBPASS={$DBPASS} -e DBNAME=${DBNAME} -e NAME=NAME -e IMAGE=IMAGE IMAGE
+
+  * Wordpress
+
+        LABEL RUN docker run -d -v ${HOME}/wordpress:/var/www/html -p 80:80 --link=mariadb:db --name NAME -e NAME=NAME -e IMAGE=IMAGE IMAGE
+
+1. Rebuild the images. The image cache will be used so only the changes will need to be built.
+
+        docker build -t mariadb mariadb/
+        docker build -t wordpress wordpress/
+
+1. Run the images using the `atomic` CLI and test using the methods from step 4.
+
+        atomic run mariadb
+        atomic run wordpress
+
+1. Once satisfied with the images tag them with the URI of the local lab local registry
+
+        docker tag mariadb <hostname_lab_dev_vm>/mariadb
+        docker tag wordpress <hostname_lab_dev_vm>/wordpress
+        docker images
+
+1. Push the images
+
+        docker push <hostname_lab_dev_vm>/mariadb
+        docker push <hostname_lab_dev_vm>/wordpress
