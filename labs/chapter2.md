@@ -1,12 +1,15 @@
 ## LAB 2: Analyzing a Monolithic Application (Dusty)
 
 Typically it is best to break down services into the simplest
-components and then containerize each of them independently. In this 
-lab we will do exactly the opposite. We will create an all-in-one container
-image comprised of multiple services as well as observe several bad
-practices when composing Dockerfiles and explore how to avoid those
-mistakes. In the lab3 we will decompose the application into more
-manageable pieces.
+components and then containerize each of them independently. However,
+when initially migrating an application it is not always easy to break
+it up into little pieces and you must start with big containers and
+work towards breaking them into smaller pieces. 
+
+In this lab we will create an all-in-one container image comprised 
+of multiple services. We will also observe several bad practices when 
+composing Dockerfiles and explore how to avoid those mistakes. In lab3 
+we will decompose the application into more manageable pieces.
 
 Expected completion: 20-25 minutes
 
@@ -66,8 +69,8 @@ docker logs bigapp
 ```
 
 If you need to inspect more than just the stderr/stdout of the machine
-then you can enter into the namespaces of the container to insepct
-things closer. The easiest way to do this is to use `docker exec`
+then you can enter into the namespace of the container to insepct
+things more closely. The easiest way to do this is to use `docker exec`. Try it out:
 
 ```
 docker exec -it bigapp /bin/bash
@@ -95,14 +98,7 @@ Now connect to the port via the web browswer on your machine using **http://ip:p
 
 So we have built a monolithic application using a somewhat complicated
 Dockerfile. There are a few principles that are good to follow when creating 
-a Dockerfile that we did not follow for this monolithic app:
-
-* Use a specific tag for the source image. Image updates may break things.
-* Place rarely changing statements towards the top of the file. This allows the re-use of cached image layers when rebuilding.
-* Group statements into multiline statements. This avoids layers that have files needed only for build.
-* Use `LABEL RUN` instruction to prescribe how the image is to be run.
-* Avoid running application as root user.
-* Use `VOLUME` instruction to create a host mount point for persistent storage.
+a Dockerfile that we did not follow for this monolithic app.
 
 To illustrate some problem points in our Dockerfile it has been 
 replicated below with some commentary added:
@@ -146,7 +142,9 @@ RUN cat /new-hosts >> /etc/hosts && yum -y install net-tools
 RUN cat /new-hosts >> /etc/hosts && yum -y install hostname
 
 >>> Can group all of the above into one yum statement to minimize 
->>> intermediate layers.
+>>> intermediate layers. However, during development, it can be nice to keep them
+>>> separated so that your "build/run/debug" cycle can take advantage of layers.
+>>> Just be sure to clean it up before you publish.
 
 # Add in wordpress sources 
 COPY latest.tar.gz /latest.tar.gz
@@ -164,5 +162,14 @@ RUN chown -R apache:apache /var/www/
 EXPOSE 80
 CMD ["/bin/bash", "/scripts/start.sh"]
 ```
+
+More generally:
+
+* Use a specific tag for the source image. Image updates may break things.
+* Place rarely changing statements towards the top of the file. This allows the re-use of cached image layers when rebuilding.
+* Group statements into multiline statements. This avoids layers that have files needed only for build.
+* Use `LABEL RUN` instruction to prescribe how the image is to be run.
+* Avoid running application as root user.
+* Use `VOLUME` instruction to create a host mount point for persistent storage.
 
 In the next lab we will fix these issues and break the application up into separate services.
