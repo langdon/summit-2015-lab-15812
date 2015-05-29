@@ -1,0 +1,40 @@
+{
+  "apiVersion": "v1beta1",
+  "id": "wordpress",
+  "desiredState": {
+    "manifest": {
+      "version": "v1beta1",
+      "id": "wordpress",
+      "containers": [
+        {
+          "name": "wordpress",
+          "image": "MY_REPOSITORY_WITH_IMAGE_NAME",
+          "ports": [
+            {
+              "containerPort": 80
+            }
+          ],
+          "env": [
+            {
+              "name": "DB_ENV_DBUSER",
+              "value": "user"
+            },
+            {
+              "name": "DB_ENV_DBPASS",
+              "value": "mypassword"
+            },
+            {
+              "name": "DB_ENV_DBNAME",
+              "value": "mydb"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "labels": {
+    "name": "wpfrontend"
+  },
+  "kind": "Pod"
+}
+
