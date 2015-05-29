@@ -192,9 +192,9 @@ To prepare for the next lab let's deploy a simple registry to store our images.
 In the next lab we will be pushing our work to this registry. Before we can do so we need to configure the docker client to connect to the registry insecurely since we do not have a CA-signed certificate.
 
 1. Edit `/etc/sysconfig/docker`
-1. Add this line
+1. Find the line in the file that has INSECURE_REGISTRY and make the following change.  We are telling Docker that it is safe to use this registry.
 
-         INSECURE_REGISTRY='--insecure-registry summit-rhel-dev'`
+         INSECURE_REGISTRY='--insecure-registry summit-rhel-dev'
 
 1. Save, exit and restart docker daemon
 
