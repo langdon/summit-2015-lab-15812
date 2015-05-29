@@ -1,9 +1,12 @@
 ## LAB 2: Analyzing a Monolithic Application (Dusty)
 
-In this lab we will create a monolithic, all-in-one container image 
-comprised of multiple services. We will also observe several bad
+Typically it is best to break down services into the simplest
+components and then containerize each of them independently. In this 
+lab we will do exactly the opposite. We will create an all-in-one container
+image comprised of multiple services as well as observe several bad
 practices when composing Dockerfiles and explore how to avoid those
-mistakes.
+mistakes. In the lab3 we will decompose the application into more
+manageable pieces.
 
 Expected completion: 20-25 minutes
 
@@ -14,7 +17,7 @@ Expected completion: 20-25 minutes
 * connecting to the application
 * review Dockerfile practices
 
-### Monolithic Application Overview and Dockerfile review
+### Monolithic Application Overview 
 
 Our monolithic application we are going to use in this lab is a simple
 wordpress application. Rather than decompose the application into
@@ -36,7 +39,7 @@ commands:
 
 ```
 cd bigapp/
-docker build -t monolithic .
+docker build -t bigimg .
 ```
 
 ### Run Container Based on Docker Image
@@ -45,7 +48,7 @@ To run the docker container based on the image we just built use the
 following command:
 
 ```
-docker run -p 80 --name=bigapp -e DBUSER=user -e DBPASS=mypassword -e DBNAME=mydb -d monolithic
+docker run -p 80 --name=bigapp -e DBUSER=user -e DBPASS=mypassword -e DBNAME=mydb -d bigimg
 ```
 
 ### Exploring the Running Container
@@ -54,6 +57,9 @@ Now that the container is running we will explore the running
 container to see what's going on inside. First off the processes were
 started and any output that goes to stdout will come to the console of
 the container. You can run `docker logs` to see the output. To follow or "tail" the logs use the `-f` option.
+
+**__NOTE:__** You are able to use the **name** of the container rather
+than the container id for most `docker` commands.
 
 ```
 docker logs bigapp
@@ -74,9 +80,11 @@ Press `CTRL+d` or type `exit` to exit the container shell.
 
 ### Connecting to the Application
 
-First detect the port number that is mapped to the container's port 80:
+First detect the ip address of the host machine *and* the host port
+number that is is mapped to the container's port 80:
 
 ```
+ip -4 -o addr
 docker port bigapp
 ```
 
