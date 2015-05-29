@@ -11,7 +11,7 @@ ADD ./hosts /new-hosts
 RUN cat /new-hosts >> /etc/hosts && yum -y update
 
 # Common Deps
-RUN cat /new-hosts >> /etc/hosts && yum -y install openssl
+RUN cat /new-hosts >> /etc/hosts && yum -y install openssl procps-ng
 RUN cat /new-hosts >> /etc/hosts && yum -y install psmisc 
 
 # Deps for wordpress
