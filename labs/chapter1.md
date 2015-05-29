@@ -5,7 +5,7 @@ In this lab we will explore the docker environment. If you are familiar with doc
 
 ###Docker and systemd
 
-* Check out the systemd unit file that starts Docker on our host and that it includes 3 EnvironmentFiles.  These files tell Docker how the Docker daemon, storage and networking should be set up and configured.  Take a look at those files too.  Specifically, in the /etc/sysconfig/docker check out the registry settings.  You may find it interesting that you can ADD_REGISTRY and BLOCK_REGISTRY.  Think about the different use cases for that.
+* Check out the systemd unit file that starts Docker on our host and notice that it includes 3 EnvironmentFiles.  These files tell Docker how the Docker daemon, storage and networking should be set up and configured.  Take a look at those files too.  Specifically, in the /etc/sysconfig/docker check out the registry settings.  You may find it interesting that you can ADD_REGISTRY and BLOCK_REGISTRY.  Think about the different use cases for that.
 
 
 ```
@@ -18,24 +18,36 @@ In this lab we will explore the docker environment. If you are familiar with doc
 * Now start Docker, or make sure that it is started before moving forward.
 
 ```
-# systemctl status docker
 # systemctl start docker
+# systemctl status docker
 ```
 
 ###Docker Help
 
 * Now that we see how the Docker startup process works, we should make sure we know how to get help when we need it.  Run the following commands to get familiar with what is included in the Docker package as well as what is provided in the man pages.  Spend some time exploring here, it's helpful.  When you run *docker info* check out the storage configuration.  You will notice that by default it is using *device mapper loopback*.  This can and should be changed to *device mapper direct LVM*.  Performance and stability will be improved.  See the storage section on the [RHEL Atomic Getting Started Guide.](https://access.redhat.com/articles/rhel-atomic-getting-started#storage) 
 
+Check out the executables provided:
+
 ```
 # rpm -ql docker | grep bin
+```
+
+Check out the configuration files that are provided:
+
+```
 # rpm -qc docker
+```
+
+Check out the documentation that is provided:
+
+```
 # rpm -qd docker
 # docker --help
 # docker run --help
 # docker info
 ```
 
-* Take a look at the Docker images on the system.  These images have been cached here ahead of time. You should see some RHEL images and some CentOS images.
+* Take a look at the Docker images on the system.  These images have been cached here ahead of time. You should see some RHEL images.
   
 ```
 # docker images
@@ -43,7 +55,7 @@ In this lab we will explore the docker environment. If you are familiar with doc
 
 ###Let's explore a Dockerfile
 
-Here we are just going to explore a simple Dockerfile.  The purpose for this is to have a look at some of the basic commands that are used to construct a Docker image.  For this lab, we will explore a basic Apache Dockerfile.
+Here we are just going to explore a simple Dockerfile.  The purpose for this is to have a look at some of the basic commands that are used to construct a Docker image.  For this lab, we will explore a basic Apache Dockerfile and then confirm functionality.
 
 * As root, change directory to *~/Dockerfiles/apache* and *cat* out the Dockerfile
 
@@ -54,8 +66,9 @@ FROM registry.access.redhat.com/rhel:7.1-6
 MAINTAINER Student <student@foo.io>
 
 ADD ./local.repo /etc/yum.repos.d/local.repo
-RUN yum -y update && yum clean all
-RUN yum -y install httpd && yum clean all
+ADD ./hosts /new-hosts
+RUN cat /new-hosts >> /etc/hosts && yum -y update && yum clean all
+RUN cat /new-hosts >> /etc/hosts && yum -y install httpd && yum clean all
 RUN echo "Apache" >> /var/www/html/index.html
 
 EXPOSE 80
@@ -67,7 +80,7 @@ RUN chmod -v +x /run-apache.sh
 CMD ["/run-apache.sh"]
 ```
 
-Here you can see in the *FROM* command that we are pulling a RHEL 7.1 base image that we are going to install Docker on.  We are also using a local yum repo.  We are doing this because we are in a disconnected environment.  However, the way RHEL images normally get access to content is by inheriting the subscriptions that are on the host they are running on.  Next we update the container and install *httpd*.  Finally, we modify the index.html file, *EXPOSE* port 80 which allows traffic into the container and start the container with a a *CMD* of *run-apache.sh".  
+Here you can see in the *FROM* command that we are pulling a RHEL 7.1 base image that we are going to install Docker on.  We are also using a local yum repo, well, local to this environment.  We are doing this because we are in a disconnected lab environment.  However, the way RHEL images normally get access to content is by inheriting the subscriptions that are on the host they are running on.  Next we update the container and install *httpd*.  You will notice here that we have an additional command "cat /new-hosts >> /etc/hosts". The reason for this is simply to provide name resolution.  Why do we do it on two lines?  Well, we have to make the change for each layer.  Finally, we modify the index.html file, *EXPOSE* port 80 which allows traffic into the container and start the container with a a *CMD* of *run-apache.sh".  
 
 
 ## Build an Image
