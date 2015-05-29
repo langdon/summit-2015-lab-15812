@@ -1,3 +1,5 @@
+# SO... i made some edits to content, also asked some questions in this very annoying, but, easily removable, way :)
+
 ## LAB 3: Deconstructing an application into microservices (Aaron)
 
 In this lab you will deconstruct an application into microservices, creating a multi-container application. In this process we explore the challenges of networking, storage and configuration.
@@ -44,7 +46,7 @@ The Wordpress tar file was extracted into `/var/www/html`. List the files.
 ls -l /var/www/html
 ```
 
-If these files change and the container dies the changes will be lost. These files should be mounted to persistent storage on the host.
+If these files change and the container is removed the changes will be lost. These files should be mounted to persistent storage on the host.
 
 **Database**
 
@@ -62,14 +64,17 @@ Once we've inspected the container stop and remove it. `docker ps -ql` prints th
 docker stop $(docker ps -ql)
 docker rm $(docker ps -ql)
 ```
+**Don't** forget to leave the container first.
 
 ### Create the Dockerfiles
 
-Now we will develop the two images. Using the information above and the Dockerfile from Lab 2 as a guide we will create Dockerfiles for each service. For this lab we have created a directory for each service with the required files for the service.
+Now we will develop the two images, one for the database and one for the webserver. Using the information above and the Dockerfile from Lab 2 as a guide, we will create Dockerfiles for each image/container. For this lab we have created a directory for each image with the appropriate files.
 
 ```
 $ ls -lR
 ```
+# transition problem here, we need to move them to the appropriate directory, or, even, after the above, a blank dir to start this lab.. see also https://github.com/whitel/summit-2015-lab-15812/issues/33
+# my comments from here will be based on "blank dir"
 
 #### MariaDB Dockerfile
 
@@ -87,7 +92,10 @@ $ ls -lR
         ADD ./local.repo /etc/yum.repos.d/local.repo
         ADD ./hosts /new-hosts
 
-1. Add the required packages. We'll include `yum clean all` at the end to clear the yum cache.
+#cp ~/sync/lab3/mariadb/local.repo ~/my-lab3/mariadb
+#cp ~/sync/lab3/mariadb/hosts ~/my-lab3/mariadb
+
+1. Add the required packages. We'll include `yum clean all` at the end to clear the yum cache and save space in the final image size.
 
         RUN cat /new-hosts >> /etc/hosts && \
             yum -y install mariadb-server openssl psmisc net-tools hostname && \
@@ -98,15 +106,17 @@ $ ls -lR
         ADD scripts /scripts
         RUN chmod 755 /scripts/*
 
+# cp -R ~/sync/lab3/mariadb/scripts/ ~/my-lab3/mariadb/
+
 1. Add an instruction to expose the database port.
 
         EXPOSE 3306
 
-1. Add a `VOLUME` instruction for `/var/lib/mysql`.
+1. Add a `VOLUME` instruction for `/var/lib/mysql` which is where we discovered mariadb was storing its data.
 
         VOLUME /var/lib/mysql
 
-1. Finish by adding the `CMD` instruction.
+1. Finish by adding the `CMD` instruction. The `CMD` is what will be run if we `docker run` an image passing no arguments at the end.
 
         CMD ["/bin/bash", "/scripts/start.sh"]
 
@@ -129,6 +139,8 @@ Now we'll create the Wordpress Dockerfile.
 
         ADD ./local.repo /etc/yum.repos.d/local.repo
         ADD ./hosts /new-hosts
+#cp ~/sync/lab3/wordpress/hosts ~/my-lab3/wordpress/
+#cp ~/sync/lab3/wordpress/local.repo ~/my-lab3/wordpress/
 
 1. Add the required packages. We'll include `yum clean all` at the end to clear the yum cache.
 
@@ -141,16 +153,20 @@ Now we'll create the Wordpress Dockerfile.
         ADD scripts /scripts
         RUN chmod 755 /scripts/*
 
-1. Add the Wordpress source from gzip tar file. Docker will extract the files.
+#cp -R ~/sync/lab3/wordpress/scripts/ ~/my-lab3/wordpress/
+
+1. Add the Wordpress source from gzip tar file. Docker will extract the files and remove the tar.
 
         ADD latest.tar.gz /var/www/html
         RUN chown -R apache:apache /var/www/
+
+#  cp ~/sync/lab3/wordpress/latest.tar.gz ~/my-lab3/wordpress/
 
 1. Add an instruction to expose the web server port.
 
         EXPOSE 80
 
-1. Add a `VOLUME` instruction for `/var/www/html`.
+1. Add a `VOLUME` instruction for `/var/www/html` so that we won't lose the web files if the container is removed.
 
         VOLUME /var/www/html
 
@@ -169,7 +185,7 @@ Now we are ready to build the images to test our Dockerfiles.
         docker build -t mariadb mariadb/
         docker build -t wordpress wordpress/
 
-1. If the build does not return `Successfully built <image_id>` the resolve the issue and build again. Once successful, list the images.
+1. If the build does not return `Successfully built <image_id>` resolve the issue and build again. Once successful, list the images.
 
         docker images
 
@@ -182,7 +198,9 @@ Now we are ready to build the images to test our Dockerfiles.
             docker logs $(docker ps -ql)
             curl http://localhost:3306
 
-  **Note**: the `curl` command does not return useful information but demonstrates a response on the port.
+  **Note**: the `curl` command does not return useful information but demonstrates an appropriate response on the port.
+
+#should we kill the maria instance before moving on?
 
 1. Test the Wordpress image to confirm connectivity. Additional run options:
   * `--link <name>:<alias>` to link to the database container
@@ -210,6 +228,10 @@ Now we are ready to build the images to test our Dockerfiles.
         atomic run mariadb
         atomic run wordpress
 
+# no atomic in the image.. adding to vagrantfile
+
+# should we test that they can talk to each other with docker-link?
+
 1. Once satisfied with the images tag them with the URI of the local lab local registry
 
         docker tag mariadb <hostname_lab_dev_vm>/mariadb
@@ -220,6 +242,9 @@ Now we are ready to build the images to test our Dockerfiles.
 
         docker push <hostname_lab_dev_vm>/mariadb
         docker push <hostname_lab_dev_vm>/wordpress
+
+# want to show how to add "--insecure-registry"? i know i found the "hints" in the config file confusing
+# i think you need to specify the port unless the registry is running on 80
 
 ### Clean Up
 
