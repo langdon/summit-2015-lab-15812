@@ -1,7 +1,10 @@
+# SO... i made some edits to content, also asked some questions in this very annoying, but, easily removable, way :) I also made some changes to the Vagrantfile to support some of this, but, I will put them on "main" cause I don't think they hurt anything even if you don't like my edit(s)
+
 ## LAB 1: Docker refresh (Scott)
 
-In this lab we will explore the docker environment. If you are familiar with docker this may function as a brief refresher. If you are new to docker this will serve as an introduction to docker basics.  Don't worry, we will progress rapidly.  To get through this lab, we are going to focus on the environment itself as well as walk through some exercises with a couple of Docker images / containers to tell a complete story and point out some things that you might have to consider when containerizing your application.
+In this lab we will explore the docker environment. If you are familiar with docker this may function as a brief refresher. If you are new to docker this will serve as an introduction to docker basics.  Don't worry, we will progress rapidly.  To get through this lab, we are going to focus on the environment itself, as well as walk through some exercises with a couple of Docker images / containers. Rather than a dry set of tasks, we will follow a "story" and point out some things that you might have to consider when containerizing your application.
 
+# do you want to tell them how to log in to the box?
 
 ###Docker and systemd
 
@@ -36,7 +39,10 @@ In this lab we will explore the docker environment. If you are familiar with doc
 ```
 
 * Take a look at the Docker images on the system.  These images have been cached here ahead of time. You should see some RHEL images and some CentOS images.
-  
+
+# i only found a registry image on "docker images." i think some of the "docker pulls" were removed, we might want to add them back to make this more interesting
+
+
 ```
 # docker images
 ```
@@ -45,7 +51,7 @@ In this lab we will explore the docker environment. If you are familiar with doc
 
 Here we are just going to explore a simple Dockerfile.  The purpose for this is to have a look at some of the basic commands that are used to construct a Docker image.  For this lab, we will explore a basic Apache Dockerfile.
 
-* As root, change directory to *~/Dockerfiles/apache* and *cat* out the Dockerfile
+* As root, change directory to *~/Dockerfiles/lab1* and *cat* out the Dockerfile
 
 ```
 # cd ~/Dockerfiles/apache
@@ -67,7 +73,7 @@ RUN chmod -v +x /run-apache.sh
 CMD ["/run-apache.sh"]
 ```
 
-Here you can see in the *FROM* command that we are pulling a RHEL 7.1 base image that we are going to install Docker on.  We are also using a local yum repo.  We are doing this because we are in a disconnected environment.  However, the way RHEL images normally get access to content is by inheriting the subscriptions that are on the host they are running on.  Next we update the container and install *httpd*.  Finally, we modify the index.html file, *EXPOSE* port 80 which allows traffic into the container and start the container with a a *CMD* of *run-apache.sh".  
+Here you can see in the *FROM* command that we are pulling a RHEL 7.1 base image that we are going to install Docker on.  We are also using a local yum repo.  We are doing this because we are in a disconnected environment.  However, the way RHEL images normally get access to content is by inheriting the subscriptions that are on the host they are running on.  Next we update the container and install *httpd*.  Finally, we modify the index.html file, *EXPOSE* port 80 which allows traffic into the container and start the container with a *CMD* of *run-apache.sh".
 
 
 ## Build an Image
@@ -77,6 +83,8 @@ Here you can see in the *FROM* command that we are pulling a RHEL 7.1 base image
 ```
 # docker build -t redhat/apache .
 ```
+**Note** the period at the end of the line.
+# is it worth talking about "docker images --tree" and/or [dockviz](https://github.com/justone/dockviz)? to show "what happened"?
 
 ## Run the Container
 
@@ -88,25 +96,28 @@ Here you can see in the *FROM* command that we are pulling a RHEL 7.1 base image
 # docker ps
 ```
 
-Here we are using a few switches to configure the running container the way we want it.  We are running a *-dt* to run in detached mode with a psuedo TTY.  Next we are mapping a port from the host to the contianer.  We are being explicit here.  We are telling Docker to map port 80 on the host to port 80 in the container.  Now, we could have let Docker handle the host side port mapping dynamically by passing a *-p 80*, in which case Docker would have randomly assigned a port to the container.  You can find that by doing a *docker ps* and see what port got assigned.  Finally we passed in the name of the image that we built earlier.
+Here we are using a few switches to configure the running container the way we want it.  We are running a *-dt* to run in detached mode with a psuedo TTY.  Next we are mapping a port from the host to the contianer.  We are being explicit here.  We are telling Docker to map port 80 on the host to port 80 in the container.  Now, we could have let Docker handle the host side port mapping dynamically by passing a *-p 80* (or -P which would dynamically assign all *EXPOSE*d ports), in which case Docker would have randomly assigned a port to the container.  You can find the dynamically assigned port(s) by doing a *docker ps* and see what port got assigned.  Finally we passed in the name of the image that we built earlier.
 
 
-* OKay, let's make sure we can access the web server.
+* Okay, let's make sure we can access the web server.
 
 ```
 # curl http://localhost
 Apache
 ```
 
-* Now that we have built an image, launched a container and confirmed that it is running, lets do some further inspection of the container.  We should take a look at the container IP address.  Let's use *docker inspect* to do that.
+* Now that we have built an image, launched a container and confirmed that it is running, lets do some further inspection of the container.  We should take a look at the container's IP address.  Let's use *docker inspect* to do that.
 
 ## Time to Inspect
 
 ```
 # docker inspect <container id>
 ```
+**Note** you can find the *container id* by running *docker ps*
 
-We can see that this gives us quite a bit of information in json format.  We can scroll around and find the IP address, it will be towards the bottom.  
+**Pro Tip:** you only, generally, need the first 3 characters of the id, just enough to make it unique
+
+We can see that this gives us quite a bit of information in JSON format.  We can scroll around and find the IP address, it will be towards the bottom.
 
 * Let's be more explicit with our *docker inspect*
 
@@ -114,6 +125,7 @@ We can see that this gives us quite a bit of information in json format.  We can
 # docker inspect --format '{{ .NetworkSettings.IPAddress }}' <container id>
 172.17.0.6
 ```
+**Note** your IP may vary slightly from the above, but it should be in 172.17.0.0/24
 
 We can apply the same filter to any value in the json output.  Try a few different ones.
 
@@ -145,6 +157,7 @@ Well, what can we do?  You can install software into this container.
 # yum -y install iproute
 # ip a
 ```
+# this ^^ didn't work for me because the host resolution didn't work, I think it is because I couldn't find the wonky change to the dockerfile, but I am not sure.
 
 Exit the container namespace with `CTRL+d` or `exit`.
 
@@ -153,5 +166,7 @@ In addition to using nsenter to enter the namespace of your container, you can a
 ```
 docker exec <container id> pwd
 ```
+# you can also do /bin/bash in to the container, which some might find easier than nsenter
 
-Whew, so we do have some options.  Now, remember that this lab is all about containerizing your existing apps.  You will need some of the tools listed above to go through the process of containerizing your apps. Troubleshooting problems when you are in a container is going to be something that you get very familiar with.
+
+Whew, so we do have some options.  Now, remember that this lab is all about containerizing your existing apps.  You will need some of the tools listed above to go through the process of containerizing your apps. Troubleshooting problems when you are in a container is going to be something that you get very familiar with. However, always be careful to add whatever changes you make in the container that are "real" (vs for debugging) to your Dockerfile.
