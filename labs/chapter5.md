@@ -16,7 +16,7 @@ In a production environment we have several problems:
 
 ### Packaging Wordpress
 
-In this section we package the Wordpress application as an Atomic App. To demonstrate the composite nature of Atomic apps we have pre-loaded the database atomic app. The Wordpress application will reference the remote database Atomic App.
+In this section we package the Wordpress application as an Atomic App. To demonstrate the composite nature of Atomic apps we have pre-loaded the database atomic app. In this model a partnering software vendor provides an Atomic App that is certified on Red Hat platforms. The Wordpress application will reference the certified database Atomic App.
 
 [insert image here]
 
