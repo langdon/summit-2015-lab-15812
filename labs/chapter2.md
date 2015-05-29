@@ -8,17 +8,19 @@ work towards breaking them into smaller pieces.
 
 In this lab we will create an all-in-one container image comprised 
 of multiple services. We will also observe several bad practices when 
-composing Dockerfiles and explore how to avoid those mistakes. In lab3 
+composing Dockerfiles and explore how to avoid those mistakes. In lab 33 
 we will decompose the application into more manageable pieces.
 
 Expected completion: 20-25 minutes
 
-* overview of monolithic application
-* build docker image
-* run container based on docker image
-* exploring the running container
-* connecting to the application
-* review Dockerfile practices
+Agenda:
+
+* Overview of monolithic application
+* Build docker image
+* Run container based on docker image
+* Exploring the running container
+* Connecting to the application
+* Review Dockerfile practices
 
 ### Monolithic Application Overview 
 
@@ -52,7 +54,10 @@ following command:
 
 ```
 docker run -p 80 --name=bigapp -e DBUSER=user -e DBPASS=mypassword -e DBNAME=mydb -d bigimg
+docker ps
 ```
+
+Take a look at some of the arguments we are passing to Docker.  We are telling Docker that the image will be listening on port 80 inside the container and to randomly assign a port on the host that maps to port 80 in the container.  Next we are providing a name of "bigapp".  After that we are setting some environment variables that will be passed into the contianer and consumed by the configuration scripts to set up the container.  Finally, we pass it the name of the image that we built in the prior step.
 
 ### Exploring the Running Container
 
@@ -79,6 +84,14 @@ cat /var/www/html/wp-config.php | grep '=='
 tail -f /var/log/httpd/access_log /var/log/httpd/error_log /var/log/mariadb/mariadb.log
 ```
 
+Explore the running processes.  Here you will httpd and MySQL running in the background.
+
+```
+ps aux
+```
+
+
+
 Press `CTRL+d` or type `exit` to exit the container shell.
 
 ### Connecting to the Application
@@ -91,7 +104,9 @@ ip -4 -o addr
 docker port bigapp
 ```
 
-Now connect to the port via the web browswer on your machine using **http://ip:port**
+Now connect to the port via the web browser on your machine using **http://ip:port**.  You can also use curl to connect, for example:
+
+curl -L http://192.168.121.97:32769
 
 
 ### Review Dockerfile practices
@@ -143,8 +158,13 @@ RUN cat /new-hosts >> /etc/hosts && yum -y install hostname
 
 >>> Can group all of the above into one yum statement to minimize 
 >>> intermediate layers. However, during development, it can be nice to keep them
->>> separated so that your "build/run/debug" cycle can take advantage of layers.
->>> Just be sure to clean it up before you publish.
+>>> separated so that your "build/run/debug" cycle can take advantage of layers and caching.
+>>> Just be sure to clean it up before you publish.  For this example, check out the history of the image you just created:
+>>>
+>>>
+>>> docker history bigimg
+>>>
+
 
 # Add in wordpress sources 
 COPY latest.tar.gz /latest.tar.gz
