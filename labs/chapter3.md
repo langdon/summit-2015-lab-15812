@@ -56,23 +56,24 @@ grep databases /var/log/mariadb/mariadb.log
 
 The `/var/lib/mysql` should also be mounted to persistent storage on the host.
 
-Once we've inspected the container stop and remove it. `docker ps -ql` prints the ID of the latest created container.
+Once we've inspected the container stop and remove it. `docker ps -ql` prints the ID of the latest created container.  First you will need to exit the container.
 
 ```
+exit
 docker stop $(docker ps -ql)
 docker rm $(docker ps -ql)
 ```
 
 ### Create the Dockerfiles
 
-Now we will develop the two images. Using the information above and the Dockerfile from Lab 2 as a guide we will create Dockerfiles for each service. For this lab we have created a directory for each service with the required files for the service.
+Now we will develop the two images. Using the information above and the Dockerfile from Lab 2 as a guide we will create Dockerfiles for each service. For this lab we have created a directory for each service with the required files for the service.  Please explore these directories and check out the contents.
 
 ```
 cd /root/workspace
 cp -R /root/lab3/mariadb .
 cp -R /root/lab3/wordpress .
-$ ls -lR mariadb
-$ ls -lR wordpress
+ls -lR mariadb
+ls -lR wordpress
 ```
 
 #### MariaDB Dockerfile
@@ -170,7 +171,7 @@ Save the Dockerfile and exit the editor.
 
 Now we are ready to build the images to test our Dockerfiles.
 
-1. Build each image. When building an image docker requires the path to the directory of the Dockerfile.
+1. Build each image. When building an image docker requires the path to the directory of the Dockerfile. 
 
         docker build -t mariadb mariadb/
         docker build -t wordpress wordpress/
@@ -193,11 +194,17 @@ Now we are ready to build the images to test our Dockerfiles.
 1. Test the Wordpress image to confirm connectivity. Additional run options:
   * `--link <name>:<alias>` to link to the database container
 
-            docker run -d -p 80:80 --link mariadb:db wordpress
+            docker run -d -p 80:80 --link mariadb:db --name wordpress wordpress
             docker logs $(docker ps -ql)
-            curl http://localhost
+            curl -L http://localhost
 
-1. When we have a working `docker run` recipe add a `LABEL RUN` instruction to each Dockerfile to prescribe how the image is to be run. This instruction will be used by the `atomic` CLI to run the image reliably. The environment variables `NAME` and `IMAGE` are used by atomic CLI
+1. Stop the containers now and remove them.
+
+            docker stop mariadb wordpress
+            docker rm mariadb wordpress
+            
+
+1. When we have a working `docker run` recipe add a `LABEL RUN` instruction towards the bottom of each Dockerfile above the CMD to prescribe how the image is to be run. This instruction will be used by the `atomic` CLI to run the image reliably. The environment variables `NAME` and `IMAGE` are used by atomic CLI.
   * MariaDB
 
             LABEL RUN docker run -d -v ${HOME}/mysql:/var/lib/mysql  --name NAME -e DBUSER=${DBUSER} -e DBPASS={$DBPASS} -e DBNAME=${DBNAME} -e NAME=NAME -e IMAGE=IMAGE IMAGE
