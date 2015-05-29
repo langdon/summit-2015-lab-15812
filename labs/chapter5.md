@@ -43,7 +43,7 @@ Open the Nulecule template file in a text editor.
         ...
         graph:
           - name: mariadb
-            source: "docker://summit-rhel-dev/mariadb/atomicapp"
+            source: "docker://summit-rhel-dev:5000/mariadb/atomicapp"
         ...
 
 1. Copy the Wordpress kubernetes files created in lab 4 into the `artifacts` directory. Since these are for the kubernetes providers we'll put them in a `kubernetes` sub-directory. This path will match the Nulecule template `- file:artifacts/kubernetes/` reference. Since it ends in a trailing "slash" (`/`) all files in the directory will be deployed.
@@ -99,4 +99,4 @@ Open the Nulecule template file in a text editor.
 1. When you're satisfied push the Atomic app to the registry
 
         docker tag wordpress-rhel7-atomicapp summit-rhel-dev/wordpress-rhel7-atomicapp
-        docker push summit-rhel-dev/wordpress-rhel7-atomicapp
+        docker push summit-rhel-dev:5000/wordpress-rhel7-atomicapp

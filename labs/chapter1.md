@@ -176,4 +176,11 @@ To prepare for the next lab let's deploy a simple registry to store our images.
 
         docker ps
 
-In the next lab we will be pushing our work to this registry.
+In the next lab we will be pushing our work to this registry. Before we can do so we need to configure the docker client to connect to the registry insecurely since we do not have a CA-signed certificate.
+
+1. Edit `/etc/sysconfig/docker`
+1. Add line `# INSECURE_REGISTRY='--insecure-registry summit-rhel-dev'`
+1. Save, exit and restart docker daemon
+
+        systemctl restart docker
+

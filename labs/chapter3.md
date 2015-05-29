@@ -4,11 +4,11 @@ In this lab you will deconstruct an application into microservices, creating a m
 
 Expected completion: 20-30 minutes
 
-present an architectual graphic (deconstructed, microservices)
+TODO: present an architectual graphic (deconstructed, microservices)
 
 ### Decompose the application
 
-Let's enter the container and explore.
+In the previous lab we created an "all-in-one" application. Let's enter the container and explore.
 
 ```
 docker exec -it bigapp /bin/bash
@@ -68,7 +68,11 @@ docker rm $(docker ps -ql)
 Now we will develop the two images. Using the information above and the Dockerfile from Lab 2 as a guide we will create Dockerfiles for each service. For this lab we have created a directory for each service with the required files for the service.
 
 ```
-$ ls -lR
+cd /root/workspace
+cp -R /root/lab3/mariadb .
+cp -R /root/lab3/wordpress .
+$ ls -lR mariadb
+$ ls -lR wordpress
 ```
 
 #### MariaDB Dockerfile
@@ -212,14 +216,14 @@ Now we are ready to build the images to test our Dockerfiles.
 
 1. Once satisfied with the images tag them with the URI of the local lab local registry
 
-        docker tag mariadb <hostname_lab_dev_vm>/mariadb
-        docker tag wordpress <hostname_lab_dev_vm>/wordpress
+        docker tag mariadb summit-rhel-dev/mariadb
+        docker tag wordpress summit-rhel-dev/wordpress
         docker images
 
 1. Push the images
 
-        docker push <hostname_lab_dev_vm>/mariadb
-        docker push <hostname_lab_dev_vm>/wordpress
+        docker push summit-rhel-dev:5000/mariadb
+        docker push summit-rhel-dev:5000/wordpress
 
 ### Clean Up
 
