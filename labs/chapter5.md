@@ -24,7 +24,7 @@ In this section we package the Wordpress application as an Atomic App. To demons
 Copy the Nulecule template files to the workspace directory.
 
 ```
-cp -r /root/lab5/nulecule_template/* /root/workspace/atomicapp/.
+cp -R /root/lab5/nulecule_template/* /root/workspace/atomicapp/.
 ```
 
 Open the Nulecule template file in a text editor.
@@ -69,6 +69,10 @@ Open the Nulecule template file in a text editor.
                 default: db_wordpress
         ...
 
+1. Edit the kubernetes files and replace parameter values to match the name of each parameter in the Nulecule file.
+
+[FIXME]
+
 1. Edit the Nulecule file metadata section.
 
         --- 
@@ -86,7 +90,7 @@ Open the Nulecule template file in a text editor.
 
 1. Build the Atomic app
 
-        docker build -t wordpress-rhel7-atomicapp
+        docker build -t wordpress-rhel7-atomicapp .
 
 1. Run the Atomic app in `--dry-run` mode, then run it for real to verify it works
 
