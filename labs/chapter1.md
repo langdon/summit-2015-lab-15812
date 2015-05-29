@@ -155,3 +155,25 @@ docker exec <container id> pwd
 ```
 
 Whew, so we do have some options.  Now, remember that this lab is all about containerizing your existing apps.  You will need some of the tools listed above to go through the process of containerizing your apps. Troubleshooting problems when you are in a container is going to be something that you get very familiar with.
+
+### Deploy a Container Registry
+
+To prepare for the next lab let's deploy a simple registry to store our images.
+
+1. Inspect the Dockerfile that has been prepared. Notice the defaults that have been chosen. These may be overriden.
+
+        cat registry/Dockerfile
+
+1. Build the registry
+
+        docker build -t registry registry/
+
+1. Run the registry in daemonized mode using default parameters.
+
+        docker run --name registry -d registry
+
+1. Confirm the registry is running.
+
+        docker ps
+
+In the next lab we will be pushing our work to this registry.
