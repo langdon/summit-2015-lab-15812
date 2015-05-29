@@ -210,4 +210,115 @@ vi ~/workspace/wordpress/kubernetes/wordpress-pod.json
 
 A couple things to notice about this file. Obviously, we change all the appropriate names to reflect "wordpress" but, largely, it is the same as the mariadb pod file. We also use the environment variables that are specified by the wordpress container, although they need to get the same values as the ones in the mariadb pod. Lastly, just to show you aren't bound to the image or pod names, we also changed the ```labels``` value to "wpfronted".
 
+Ok, so, lets launch our pods and make sure they come up correctly. In order to do this, we need to introduce the ```kubectl``` command which is what drives Kubernetes. Generally, speaking, the formate of ```kubectl``` commands is ```kubetctl <operation> <kind>```. Where ```<operation>``` is something like ```create```, ```get```, ```remove```, etc. and ```kind``` is the ```kind``` from the pod files.
+
+```
+kubectl create -f ~/workspace/mariadb/kubernetes/mariadb-pod.json
+kubectl create -f ~/workspace/wordpress/kubernetes/wordpress-pod.json
+```
+Now, I know i just said, ```kind``` is a parameter, but, as this is a create statement, it looks in the ```-f``` file for the ```kind```.
+
+Ok, let's see if they came up:
+```
+kubectl get pods
+```
+
+Which should output two pods, one called ```mariadb``` and one called ```wpfrontend```.
+
+Ok, now let's kill them off so we can introduce the services that will let them more dynamically find each other.
+```
+kubectl remove pod mariadb
+kubectl remove pod wpfrontend
+```
+**Note** you could have just done ```kubectl remove pods``` like the get statement, but I wanted you to see how to target individual "things" rather than all the "things" of that ```kind```.
+
 ### Service Creation
+Now we want to create Kubernetes Services for our pods so that Kubernetes can introduce a layer of indirection between the pods. 
+
+Let's start with mariadb. Open up a service file:
+```
+vi ~/workspace/mariadb/kubernetes/mariadb-service.json
+```
+
+and insert the following content:
+
+```
+{
+  "kind": "Service",
+  "apiVersion": "v1beta1",
+  "id": "mariadb",
+  "port": 3306,
+  "selector": {
+    "name": "mariadb"
+  },
+  "containerPort": 3306,
+  "labels": {
+    "name": "mariadb"
+  }
+}
+```
+As you can probably tell, there isn't really anything new here. However, you need to make sure the ```kind``` is of type ```Service``` and that the ```selector``` matches at least one of the ```labels``` from the pod file. The ```selector``` is how the service finds the pod that provides its functionality.
+
+OK, now let's move on to the wordpress service. Open up a new service file:
+```
+vi ~/workspace/wordpress/kubernetes/wordpress-service.json
+```
+
+and insert:
+```
+{
+  "kind": "Service",
+  "apiVersion": "v1beta1",
+  "id": "wpfrontend",
+  "port": 80,
+  "selector": {
+    "name": "wpfrontend"
+  },
+  "containerPort": 80,
+  "labels": {
+    "name": "wpfrontend"
+  },
+  "createExternalLoadBalancer": true
+}
+```
+So, here you may notice, there is no reference to wordpress at all. In fact, we might even want to name the file wpfrontend-service.json to make it clearer that, in fact, we could have any pod that provides "wordpress capabilities". However, for a lab like this, I thought it would be confusing. 
+
+An even better example might have been if we had made the mariadb-service just a "db" service and then, the pod could be mariadb, mysql, sqlite, anything really, that can support SQL the way wordpress expects it to. In order to do that, we would have just add a ```label``` to the ```mariadb-pod.json``` called "db" and a ```selector``` in the ```mariadb-service.json``` (although, an even better name might be ```db-service.json```) called ```db```. Feel free to experiment with that at the end of this lab if you have time.
+
+Now let's get things going. Start mariadb:
+```
+kubectl create -f ~/workspace/mariadb/kubernetes/mariadb-pod.json
+kubectl create -f ~/workspace/mariadb/kubernetes/mariadb-service.json
+```
+
+Now let's start wordpress.
+```
+kubectl create -f ~/workspace/wordpress/kubernetes/wordpress-service.json
+kubectl create -f ~/workspace/wordpress/kubernetes/wordpress-pod.json
+```
+
+OK, now let's make sure everything came up correctly:
+```
+kubectl get pods
+kubectl get services
+```
+**Note** these may take a while to get motivated as the pull the image from the registry, spin up the containers, do the kubernetes magic, etc. 
+
+Eventually, you should see:
+```
+NEED TO INSERT EXAMPLE OUTPUT HERE
+```
+
+Seemed awfully manual and ordered up there, didn't it? Just wait til Lab5 where we make it a lot less painful!
+
+TODO: CHECK IT IN A WEB BROWSER
+
+OK, so let's put the proof in the pudding! Find the wordpress container (we want to simulate an outage here, so we don't want to delete the pods or services) and knock it over. And, as soon as that completes (or even consider running it in the background) run docker ps on a loop and watch Kubernetes recreate it. You can also open the site in a web browser as a above and keep reloading to see the site go away and then come back. 
+
+```
+docker rm wordpress &
+watch -n 1 docker ps
+```
+
+TODO: add in "always make sure wp stays up with two instances of wp"?
+TODO: add in "db outage tolerance to wp container"?
