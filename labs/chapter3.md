@@ -147,7 +147,9 @@ Now we'll create the Wordpress Dockerfile.
 
 1. Add the Wordpress source from gzip tar file. Docker will extract the files.
 
-        ADD latest.tar.gz /var/www/html
+        COPY latest.tar.gz /latest.tar.gz
+        RUN tar xvzf /latest.tar.gz -C /var/www/html --strip-components=1
+        RUN rm /latest.tar.gz
         RUN chown -R apache:apache /var/www/
 
 1. Add an instruction to expose the web server port.
