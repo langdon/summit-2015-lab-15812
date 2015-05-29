@@ -5,6 +5,8 @@ comprised of multiple services. We will also observe several bad
 practices when composing Dockerfiles and explore how to avoid those
 mistakes.
 
+# why? you are clearly implying monolithic is icky.. so why are we teaching them it? well, i would say, because it is "fine" for your first cut of an existing app in containers (or something)
+
 Expected completion: 20-25 minutes
 
 * overview of monolithic application
@@ -38,6 +40,7 @@ commands:
 cd bigapp/
 docker build -t monolithic .
 ```
+# ^^^ see https://github.com/whitel/summit-2015-lab-15812/issues/33
 
 ### Run Container Based on Docker Image
 
@@ -58,10 +61,11 @@ the container. You can run `docker logs` to see the output. To follow or "tail" 
 ```
 docker logs bigapp
 ```
+# worth explaining why 1) you can use "bigapp" instead of container-id? 2) it is "bigapp" and not "monolithic"?
 
 If you need to inspect more than just the stderr/stdout of the machine
-then you can enter into the namespaces of the container to insepct
-things closer. The easiest way to do this is to use `docker exec`
+then you can enter into the namespace of the container to insepct
+things more closely. The easiest way to do this is to use `docker exec`. Try it out:
 
 ```
 docker exec -it bigapp /bin/bash
@@ -81,6 +85,7 @@ docker port bigapp
 ```
 
 Now connect to the port via the web browswer on your machine using **http://ip:port**
+# how do i know what the ip is?
 
 
 ### Review Dockerfile practices
@@ -89,18 +94,11 @@ So we have built a monolithic application using a somewhat complicated
 Dockerfile. There are a few principles that are good to follow when creating 
 a Dockerfile that we did not follow for this monolithic app:
 
-* Use a specific tag for the source image. Image updates may break things.
-* Place rarely changing statements towards the top of the file. This allows the re-use of cached image layers when rebuilding.
-* Group statements into multiline statements. This avoids layers that have files needed only for build.
-* Use `LABEL RUN` instruction to prescribe how the image is to be run.
-* Avoid running application as root user.
-* Use `VOLUME` instruction to create a host mount point for persistent storage.
-
-To illustrate some problem points in our Dockerfile it has been 
+To illustrate some problem points in our Dockerfile it has been
 replicated below with some commentary added:
 
 ```
-FROM registry.access.redhat.com/rhel  
+FROM registry.access.redhat.com/rhel
 
 >>> No tags on image specification - updates could break things
 
@@ -138,7 +136,9 @@ RUN cat /new-hosts >> /etc/hosts && yum -y install net-tools
 RUN cat /new-hosts >> /etc/hosts && yum -y install hostname
 
 >>> Can group all of the above into one yum statement to minimize 
->>> intermediate layers.
+>>> intermediate layers. However, during development, it can be nice to keep them
+>>> separated so that your "build/run/debug" cycle can take advantage of layers.
+>>> Just be sure to clean it up before you publish.
 
 # Add in wordpress sources 
 COPY latest.tar.gz /latest.tar.gz
@@ -156,5 +156,16 @@ RUN chown -R apache:apache /var/www/
 EXPOSE 80
 CMD ["/bin/bash", "/scripts/start.sh"]
 ```
+
+More generally:
+
+* Use a specific tag for the source image. Image updates may break things.
+* Place rarely changing statements towards the top of the file. This allows the re-use of cached image layers when rebuilding.
+* Group statements into multiline statements. This avoids layers that have files needed only for build.
+* Use `LABEL RUN` instruction to prescribe how the image is to be run.
+* Avoid running application as root user.
+* Use `VOLUME` instruction to create a host mount point for persistent storage.
+
+# do we have any tools that would point out these issues?!?!? :)
 
 In the next lab we will fix these issues and break the application up into separate services.
