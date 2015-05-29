@@ -3,10 +3,12 @@
 In this lab we walk through packaging an application into a single deployment unit. This is called an Atomic App and is based on the [Nulecule specification](https://github.com/projectatomic/nulecule/).
 
 So far in the previous labs we have
+
 1. Created docker images and pushed them to a registry
 1. Created kubernetes files to orchestrate the running of the containers
 
 In a production environment we have several problems:
+
 1. How do we manage the orchestration files?
 1. How do we manage changing parameters to reflect the deployment target?
 1. How can we re-use common services such as a database so we don't have to re-write them every time?
