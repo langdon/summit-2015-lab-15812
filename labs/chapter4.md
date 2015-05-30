@@ -13,7 +13,7 @@ Let's start with a little experimentation. I am sure you are all excited about y
 So, let's see what will happen. Launch the site:
 
 ```
-docker run -d -p 3306:3306 -e DBUSER=user -e DBPASS=mypassword -e DBNAME=mydb --name mariadb mariadb
+docker run -d -p 3306:3306 -e DBUSER=user -e DBPASS=mypassword -e DBNAME=mydb --name mariadb mariadb-pod
 docker run -d -p 80:80 --link mariadb:db wordpress
 ```
 **Note** if you get an error about the names in use, just delete those containers with ```docker rm <name>```
@@ -23,7 +23,7 @@ Take a look at the site in your web browswer on your machine using **http://ip:p
 Now, let's see what happens when we kick over the database. However, for a later experiment, let's grab the container-id right before you do it. 
 
 ```
-OLD_CONTAINER_ID=${docker inspect --format '{{ .Id }}' mariadb}
+OLD_CONTAINER_ID=$(docker inspect --format '{{ .Id }}' mariadb)
 docker stop mariadb
 ```
 
@@ -39,7 +39,7 @@ docker start mariadb
 
 OK, now, let's compare the old container id and the new one. 
 ```
-NEW_CONTAINER_ID=${docker inspect --format '{{ .Id }}' mariadb}
+NEW_CONTAINER_ID=$(docker inspect --format '{{ .Id }}' mariadb)
 echo -e "$OLD_CONTAINER_ID\n$NEW_CONTAINER_ID"
 ```
 
@@ -89,9 +89,9 @@ Now, replace the ```"containers": []```
                     "env": [],
                     "cpu": 100,
                     "ports": [
-                    {
-                        "containerPort": 3306
-                    }
+                        {
+                            "containerPort": 3306
+                        }
                     ]
                 }
             ]
@@ -104,11 +104,11 @@ Lastly, we need to configure the environment variables that need to be fed from 
                         {
                             "name": "DBUSER",
                             "value": "user"
-                        }
+                        },
                         {
                             "name": "DBPASS",
                             "value": "mypassword"
-                        }
+                        },
                         {
                             "name": "DBNAME",
                             "value": "mydb"
@@ -132,11 +132,11 @@ OK, now we are all done, and should have a file that looks like:
                         {
                             "name": "DBUSER",
                             "value": "user"
-                        }
+                        },
                         {
                             "name": "DBPASS",
                             "value": "mypassword"
-                        }
+                        },
                         {
                             "name": "DBNAME",
                             "value": "mydb"
@@ -223,14 +223,14 @@ Ok, let's see if they came up:
 kubectl get pods
 ```
 
-Which should output two pods, one called ```mariadb``` and one called ```wpfrontend```.
+Which should output two pods, one called ```mariadb``` and one called ```wordpress```.
 
 Ok, now let's kill them off so we can introduce the services that will let them more dynamically find each other.
 ```
-kubectl remove pod mariadb
-kubectl remove pod wpfrontend
+kubectl delete pod mariadb
+kubectl delete pod wordpress
 ```
-**Note** you could have just done ```kubectl remove pods``` like the get statement, but I wanted you to see how to target individual "things" rather than all the "things" of that ```kind```.
+**Note** you used the "singular" form here on the ```kind```, which, for delete, is required and requires a "name". However, you can, usually, use them interchangably depending on the kind of information you want.
 
 ### Service Creation
 Now we want to create Kubernetes Services for our pods so that Kubernetes can introduce a layer of indirection between the pods. 
@@ -295,14 +295,14 @@ Now let's start wordpress.
 ```
 kubectl create -f ~/workspace/wordpress/kubernetes/wordpress-service.json
 kubectl create -f ~/workspace/wordpress/kubernetes/wordpress-pod.json
-```
+    ```
 
 OK, now let's make sure everything came up correctly:
 ```
 kubectl get pods
 kubectl get services
 ```
-**Note** these may take a while to get motivated as the pull the image from the registry, spin up the containers, do the kubernetes magic, etc. 
+**Note** these may take a while to get to a running state as it pulls the image from the registry, spin up the containers, do these kubernetes magic, etc. 
 
 Eventually, you should see:
 ```
