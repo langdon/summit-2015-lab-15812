@@ -8,7 +8,7 @@ work towards breaking them into smaller pieces.
 
 In this lab we will create an all-in-one container image comprised 
 of multiple services. We will also observe several bad practices when 
-composing Dockerfiles and explore how to avoid those mistakes. In lab 33 
+composing Dockerfiles and explore how to avoid those mistakes. In lab 3
 we will decompose the application into more manageable pieces.
 
 Expected completion: 20-25 minutes
@@ -43,7 +43,7 @@ To build the docker image for this lab please execute the following
 commands:
 
 ```
-cd bigapp/
+cd /root/lab2/bigapp/
 docker build -t bigimg .
 ```
 
@@ -57,7 +57,7 @@ docker run -p 80 --name=bigapp -e DBUSER=user -e DBPASS=mypassword -e DBNAME=myd
 docker ps
 ```
 
-Take a look at some of the arguments we are passing to Docker.  We are telling Docker that the image will be listening on port 80 inside the container and to randomly assign a port on the host that maps to port 80 in the container.  Next we are providing a name of "bigapp".  After that we are setting some environment variables that will be passed into the contianer and consumed by the configuration scripts to set up the container.  Finally, we pass it the name of the image that we built in the prior step.
+Take a look at some of the arguments we are passing to Docker.  We are telling Docker that the image will be listening on port 80 inside the container and to randomly assign a port on the host that maps to port 80 in the container.  Next we are providing a name of **bigapp**.  After that we are setting some environment variables that will be passed into the contianer and consumed by the configuration scripts to set up the container.  Finally, we pass it the name of the image that we built in the prior step.
 
 ### Exploring the Running Container
 
@@ -70,7 +70,7 @@ the container. You can run `docker logs` to see the output. To follow or "tail" 
 than the container id for most `docker` commands.
 
 ```
-docker logs bigapp
+docker logs bigapp | less
 ```
 
 If you need to inspect more than just the stderr/stdout of the machine
@@ -81,7 +81,7 @@ things more closely. The easiest way to do this is to use `docker exec`. Try it 
 docker exec -it bigapp /bin/bash
 pstree
 cat /var/www/html/wp-config.php | grep '=='
-tail -f /var/log/httpd/access_log /var/log/httpd/error_log /var/log/mariadb/mariadb.log
+tail /var/log/httpd/access_log /var/log/httpd/error_log /var/log/mariadb/mariadb.log
 ```
 
 Explore the running processes.  Here you will httpd and MySQL running in the background.
@@ -157,13 +157,11 @@ RUN cat /new-hosts >> /etc/hosts && yum -y install net-tools
 RUN cat /new-hosts >> /etc/hosts && yum -y install hostname
 
 >>> Can group all of the above into one yum statement to minimize 
->>> intermediate layers. However, during development, it can be nice to keep them
->>> separated so that your "build/run/debug" cycle can take advantage of layers and caching.
->>> Just be sure to clean it up before you publish.  For this example, check out the history of the image you just created:
->>>
->>>
->>> docker history bigimg
->>>
+>>> intermediate layers. However, during development, it can be nice 
+>>> to keep them separated so that your "build/run/debug" cycle can 
+>>> take advantage of layers and caching. Just be sure to clean it up
+>>> before you publish. You can check out the history of the image you
+>>> have created by running *docker history bigimg*.
 
 
 # Add in wordpress sources 
