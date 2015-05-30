@@ -1,7 +1,7 @@
 #!/bin/bash
 #execute the functionality in lab5
 
-cd ~/sync/lab5/nulecule_template
+cd ~/Dockerfiles/lab5/nulecule_template
 
 TARGET_IP=$(ip addr | grep 'state UP' -A2 | tail -n1 | awk '{print $2}' | cut -f1  -d'/')
 

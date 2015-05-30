@@ -1,7 +1,7 @@
 #!/bin/bash
 #execute the functionality in lab2 that other labs depend on 
 
-cd ~/sync/lab3
+cd ~/Dockerfiles/lab3
 
 docker stop bigapp #a little safer then $(docker ps -ql)
 docker rm bigapp #a little safer then $(docker ps -ql)
