@@ -10,15 +10,15 @@ Vagrant.configure(2) do |config|
     #vagrant sync is not a fan of wildcards
     summit_rhel_deploy_target.vm.synced_folder "./workspace", "/root/workspace/", type: "rsync",
                                     rsync__exclude: [ ".git/", ".#*", "*~" ]
-    summit_rhel_deploy_target.vm.synced_folder "./lab1", "/root/Dockerfiles/lab1", type: "rsync",
+    summit_rhel_deploy_target.vm.synced_folder "./lab1", "/root/lab1", type: "rsync",
                                     rsync__exclude: [ ".git/", ".#*", "*~" ]
-    summit_rhel_deploy_target.vm.synced_folder "./lab2", "/root/Dockerfiles/lab2", type: "rsync",
+    summit_rhel_deploy_target.vm.synced_folder "./lab2", "/root/lab2", type: "rsync",
                                     rsync__exclude: [ ".git/", ".#*", "*~" ]
-    summit_rhel_deploy_target.vm.synced_folder "./lab3", "/root/Dockerfiles/lab3", type: "rsync",
+    summit_rhel_deploy_target.vm.synced_folder "./lab3", "/root/lab3", type: "rsync",
                                     rsync__exclude: [ ".git/", ".#*", "*~" ]
-    summit_rhel_deploy_target.vm.synced_folder "./lab4", "/root/Dockerfiles/lab4", type: "rsync",
+    summit_rhel_deploy_target.vm.synced_folder "./lab4", "/root/lab4", type: "rsync",
                                     rsync__exclude: [ ".git/", ".#*", "*~" ]
-    summit_rhel_deploy_target.vm.synced_folder "./lab5", "/root/Dockerfiles/lab5", type: "rsync",
+    summit_rhel_deploy_target.vm.synced_folder "./lab5", "/root/lab5", type: "rsync",
                                     rsync__exclude: [ ".git/", ".#*", "*~" ]
     summit_rhel_deploy_target.vm.synced_folder "./support_files", "/root/support_files", type: "rsync",
                                     rsync__exclude: [ ".git/", ".#*", "*~" ]
@@ -66,15 +66,15 @@ Vagrant.configure(2) do |config|
     #vagrant sync is not a fan of wildcards
     summit_rhel_dev.vm.synced_folder "./workspace", "/root/workspace/", type: "rsync",
                                     rsync__exclude: [ ".git/", ".#*", "*~" ]
-    summit_rhel_dev.vm.synced_folder "./lab1", "/root/Dockerfiles/lab1", type: "rsync",
+    summit_rhel_dev.vm.synced_folder "./lab1", "/root/lab1", type: "rsync",
                                     rsync__exclude: [ ".git/", ".#*", "*~" ]
-    summit_rhel_dev.vm.synced_folder "./lab2", "/root/Dockerfiles/lab2", type: "rsync",
+    summit_rhel_dev.vm.synced_folder "./lab2", "/root/lab2", type: "rsync",
                                     rsync__exclude: [ ".git/", ".#*", "*~" ]
-    summit_rhel_dev.vm.synced_folder "./lab3", "/root/Dockerfiles/lab3", type: "rsync",
+    summit_rhel_dev.vm.synced_folder "./lab3", "/root/lab3", type: "rsync",
                                     rsync__exclude: [ ".git/", ".#*", "*~" ]
-    summit_rhel_dev.vm.synced_folder "./lab4", "/root/Dockerfiles/lab4", type: "rsync",
+    summit_rhel_dev.vm.synced_folder "./lab4", "/root/lab4", type: "rsync",
                                     rsync__exclude: [ ".git/", ".#*", "*~" ]
-    summit_rhel_dev.vm.synced_folder "./lab5", "/root/Dockerfiles/lab5", type: "rsync",
+    summit_rhel_dev.vm.synced_folder "./lab5", "/root/lab5", type: "rsync",
                                     rsync__exclude: [ ".git/", ".#*", "*~" ]
     summit_rhel_dev.vm.synced_folder "./support_files", "/root/support_files", type: "rsync",
                                     rsync__exclude: [ ".git/", ".#*", "*~" ]
