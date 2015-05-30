@@ -5,7 +5,7 @@ In this lab we will explore the docker environment. If you are familiar with doc
 
 ###Docker and systemd
 
-* Check out the systemd unit file that starts Docker on our host and notice that it includes 3 EnvironmentFiles.  These files tell Docker how the Docker daemon, storage and networking should be set up and configured.  Take a look at those files too.  Specifically, in the /etc/sysconfig/docker check out the registry settings.  You may find it interesting that you can ADD_REGISTRY and BLOCK_REGISTRY.  Think about the different use cases for that.
+* Check out the systemd unit file that starts Docker on our host and notice that it includes 3 EnvironmentFiles.  These files tell Docker how the Docker daemon, storage and networking should be set up and configured.  Take a look at those files too.  Specifically, in the /etc/sysconfig/docker check out the registry settings.  You may find it interesting that you can `ADD_REGISTRY` and `BLOCK_REGISTRY`.  Think about the different use cases for that.
 
 
 ```
@@ -24,7 +24,7 @@ In this lab we will explore the docker environment. If you are familiar with doc
 
 ###Docker Help
 
-* Now that we see how the Docker startup process works, we should make sure we know how to get help when we need it.  Run the following commands to get familiar with what is included in the Docker package as well as what is provided in the man pages.  Spend some time exploring here, it's helpful.  When you run *docker info* check out the storage configuration.  You will notice that by default it is using *device mapper loopback*.  This can and should be changed to *device mapper direct LVM*.  Performance and stability will be improved.  See the storage section on the [RHEL Atomic Getting Started Guide.](https://access.redhat.com/articles/rhel-atomic-getting-started#storage) 
+* Now that we see how the Docker startup process works, we should make sure we know how to get help when we need it.  Run the following commands to get familiar with what is included in the Docker package as well as what is provided in the man pages.  Spend some time exploring here, it's helpful.  When you run `docker info` check out the storage configuration.  You will notice that by default it is using *device mapper loopback*.  This can and should be changed to *device mapper direct LVM*.  Performance and stability will be improved.  See the storage section on the [RHEL Atomic Getting Started Guide.](https://access.redhat.com/articles/rhel-atomic-getting-started#storage) 
 
 Check out the executables provided:
 
@@ -57,10 +57,10 @@ Check out the documentation that is provided:
 
 Here we are just going to explore a simple Dockerfile.  The purpose for this is to have a look at some of the basic commands that are used to construct a Docker image.  For this lab, we will explore a basic Apache Dockerfile and then confirm functionality.
 
-* As root, change directory to *~/Dockerfiles/apache* and *cat* out the Dockerfile
+* As root, change directory to `~/lab1/` and `cat` out the Dockerfile
 
 ```
-# cd ~/Dockerfiles/apache
+# cd ~/lab1
 # cat Dockerfile
 FROM registry.access.redhat.com/rhel:7.1-6
 MAINTAINER Student <student@foo.io>
@@ -80,7 +80,7 @@ RUN chmod -v +x /run-apache.sh
 CMD ["/run-apache.sh"]
 ```
 
-Here you can see in the *FROM* command that we are pulling a RHEL 7.1 base image that we are going to install Docker on.  We are also using a local yum repo, well, local to this environment.  We are doing this because we are in a disconnected lab environment.  However, the way RHEL images normally get access to content is by inheriting the subscriptions that are on the host they are running on.  Next we update the container and install *httpd*.  You will notice here that we have an additional command "cat /new-hosts >> /etc/hosts". The reason for this is simply to provide name resolution.  Why do we do it on two lines?  Well, we have to make the change for each layer.  Finally, we modify the index.html file, *EXPOSE* port 80 which allows traffic into the container and start the container with a a *CMD* of *run-apache.sh".  
+Here you can see in the `FROM` command that we are pulling a RHEL 7.1 base image that we are going to build on.  We are also using a local yum repo that is local to this environment.  We are doing this because we are in a disconnected lab environment.  However, the way RHEL images normally get access to content is by inheriting the subscriptions that are on the host they are running on.  Next we update the container and install `httpd`.  You will notice here that we have an additional command `cat /new-hosts >> /etc/hosts`. The reason for this is simply to provide name resolution.  Why do we do it on two lines?  Well, we have to make the change for each layer.  Finally, we modify the index.html file, `EXPOSE` port 80 which allows traffic into the container and start the container with a a `CMD` of `run-apache.sh`.  
 
 
 ## Build an Image
@@ -101,7 +101,7 @@ Here you can see in the *FROM* command that we are pulling a RHEL 7.1 base image
 # docker ps
 ```
 
-Here we are using a few switches to configure the running container the way we want it.  We are running a *-dt* to run in detached mode with a psuedo TTY.  Next we are mapping a port from the host to the contianer.  We are being explicit here.  We are telling Docker to map port 80 on the host to port 80 in the container.  Now, we could have let Docker handle the host side port mapping dynamically by passing a *-p 80*, in which case Docker would have randomly assigned a port to the container.  You can find that by doing a *docker ps* and see what port got assigned.  Finally we passed in the name of the image that we built earlier.
+Here we are using a few switches to configure the running container the way we want it.  We are running a `-dt` to run in detached mode with a psuedo TTY.  Next we are mapping a port from the host to the contianer.  We are being explicit here.  We are telling Docker to map port 80 on the host to port 80 in the container.  Now, we could have let Docker handle the host side port mapping dynamically by passing a `-p 80`, in which case Docker would have randomly assigned a port to the container.  You can find that by doing a `docker ps` and see what port got assigned.  Finally we passed in the name of the image that we built earlier.
 
 
 * OKay, let's make sure we can access the web server.
@@ -111,7 +111,7 @@ Here we are using a few switches to configure the running container the way we w
 Apache
 ```
 
-* Now that we have built an image, launched a container and confirmed that it is running, lets do some further inspection of the container.  We should take a look at the container IP address.  Let's use *docker inspect* to do that.
+* Now that we have built an image, launched a container and confirmed that it is running, lets do some further inspection of the container.  We should take a look at the container IP address.  Let's use `docker inspect` to do that.
 
 ## Time to Inspect
 
@@ -121,7 +121,7 @@ Apache
 
 We can see that this gives us quite a bit of information in json format.  We can scroll around and find the IP address, it will be towards the bottom.  
 
-* Let's be more explicit with our *docker inspect*
+* Let's be more explicit with our `docker inspect`
 
 ```
 # docker inspect --format '{{ .NetworkSettings.IPAddress }}' <container id>
@@ -161,7 +161,7 @@ Well, what can we do?  You can install software into this container.
 
 Exit the container namespace with `CTRL+d` or `exit`.
 
-In addition to using nsenter to enter the namespace of your container, you can also execute commands in that namespace with *docker exec*.  
+In addition to using `nsenter` to enter the namespace of your container, you can also execute commands in that namespace with `docker exec`.  
 
 ```
 docker exec <container id> pwd
