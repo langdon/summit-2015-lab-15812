@@ -322,3 +322,61 @@ watch -n 1 docker ps
 
 TODO: add in "always make sure wp stays up with two instances of wp"?
 TODO: add in "db outage tolerance to wp container"?
+
+Now that we are satisfied that our containers and Kubernetes definitions work, let's try deploying it to a remote server.
+
+First, we have to add the remote cluster to our local configuration. However, before we do that, let's take a look at what we have already. Also, notice that the ``kubectl config``` follows the <noun> <verb> model. In other words, ```kubectl``` <noun>=```config``` <verb>=```view``` 
+```
+kubectl config view
+``` 
+
+Not much right? If you notice, we don't even have any information about the current context. In order to avoid losing our local connection, why don't we set up the local machine as a cluster first, before we add the remote. However, in order for the configuration to work correctly, we need to touch the config file first.
+```
+mkdir ~/.kube
+touch ~/.kube/.kubeconfig
+```
+
+First we create the cluster (after each step, I recommend you take a look at the current config with a ```view```):
+```
+kubectl config set-cluster local --server=http://localhost:8080
+kubectl config view
+```
+
+Then we add it to a context:
+```
+kubectl config set-context local-context --cluster=local
+kubectl config view
+```
+
+Now we switch to that context:
+```
+kubectl config use-context local-context
+kubectl config view
+```
+
+Strictly speaking, a lot of the above is not necessary, however, it is good to get in to the habit of using contexts so that when you are using kubectl with properly configured security and the like, you will run in to less "mysterious" headaches trying to figure out why you can't deploy.
+
+Now, lets test it out.
+```
+kubectl get pods
+kubectl get services
+```
+
+Did you get your pods and services back? If not, you should check your config. You ```config view``` result should look like this:
+```
+[root@summit-rhel-dev vagrant]# kubectl config view
+apiVersion: v1
+clusters:
+- cluster:
+    server: http://localhost:8080
+  name: local
+contexts:
+- context:
+    cluster: local
+    user: ""
+  name: local-context
+current-context: local-context
+kind: Config
+preferences: {}
+users: []
+```

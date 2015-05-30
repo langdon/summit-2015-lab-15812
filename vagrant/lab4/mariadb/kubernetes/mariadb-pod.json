@@ -13,11 +13,11 @@
                         {
                             "name": "DBUSER",
                             "value": "user"
-                        }
+                        },
                         {
                             "name": "DBPASS",
                             "value": "mypassword"
-                        }
+                        },
                         {
                             "name": "DBNAME",
                             "value": "mydb"
