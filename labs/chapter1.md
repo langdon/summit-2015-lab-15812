@@ -183,7 +183,7 @@ To prepare for the next lab let's deploy a simple registry to store our images.
 
 1. Run the registry in daemonized mode using default parameters. However, we want to make sure this container always comes back on docker restarts or machine reboots. As a result, we include ```--restart="always"```.
 
-        docker run  --restart="always" --name registry -d registry
+        docker run  --restart="always" --name registry -p 5000:5000 -d registry
 
 1. Confirm the registry is running.
 
