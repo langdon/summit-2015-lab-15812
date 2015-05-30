@@ -2,9 +2,28 @@ Vagrant.configure(2) do |config|
   config.vm.define :summit_rhel_deploy_target do | summit_rhel_deploy_target |
     summit_rhel_deploy_target.vm.box = "rhel-atomic-7"
     summit_rhel_deploy_target.vm.hostname = "summit-rhel-deploy-target"
+
+
     summit_rhel_deploy_target.vm.synced_folder ".", "/vagrant", disabled: true
-    summit_rhel_deploy_target.vm.synced_folder ".", "/home/vagrant/sync", type: "rsync",
-                          rsync__exclude: [ ".git/", ".#*", "*~" ]
+    summit_rhel_deploy_target.vm.synced_folder ".", "/home/vagrant/sync", disabled: true
+
+    #vagrant sync is not a fan of wildcards
+    summit_rhel_deploy_target.vm.synced_folder "./workspace", "/root/workspace/", type: "rsync",
+                                    rsync__exclude: [ ".git/", ".#*", "*~" ]
+    summit_rhel_deploy_target.vm.synced_folder "./lab1", "/root/Dockerfiles/lab1", type: "rsync",
+                                    rsync__exclude: [ ".git/", ".#*", "*~" ]
+    summit_rhel_deploy_target.vm.synced_folder "./lab2", "/root/Dockerfiles/lab2", type: "rsync",
+                                    rsync__exclude: [ ".git/", ".#*", "*~" ]
+    summit_rhel_deploy_target.vm.synced_folder "./lab3", "/root/Dockerfiles/lab3", type: "rsync",
+                                    rsync__exclude: [ ".git/", ".#*", "*~" ]
+    summit_rhel_deploy_target.vm.synced_folder "./lab4", "/root/Dockerfiles/lab4", type: "rsync",
+                                    rsync__exclude: [ ".git/", ".#*", "*~" ]
+    summit_rhel_deploy_target.vm.synced_folder "./lab5", "/root/Dockerfiles/lab5", type: "rsync",
+                                    rsync__exclude: [ ".git/", ".#*", "*~" ]
+    summit_rhel_deploy_target.vm.synced_folder "./support_files", "/root/support_files", type: "rsync",
+                                    rsync__exclude: [ ".git/", ".#*", "*~" ]
+    summit_rhel_deploy_target.vm.synced_folder "./answers", "/root/answers", type: "rsync",
+                                    rsync__exclude: [ ".git/", ".#*", "*~" ]
 
     # subscription manager stuff (only if vagrant-registration plugin is installed)
     if Vagrant.has_plugin?('vagrant-registration')
@@ -13,7 +32,7 @@ Vagrant.configure(2) do |config|
     end                          
 
     #move files to the right dirs, this handles the sorta-local repo
-    summit_rhel_deploy_target.vm.provision 'shell', inline: "sudo cat /home/vagrant/sync/hosts >> /etc/hosts"
+    summit_rhel_deploy_target.vm.provision 'shell', inline: "sudo cat /root/support_files/hosts >> /etc/hosts"
 
     #perform update to pull updates from the repo we just added
     summit_rhel_deploy_target.vm.provision 'shell', inline: "sudo atomic host upgrade"
@@ -40,9 +59,29 @@ Vagrant.configure(2) do |config|
   config.vm.define :summit_rhel_dev do | summit_rhel_dev |
     summit_rhel_dev.vm.box = "rhel-server-7"
     summit_rhel_dev.vm.hostname = "summit-rhel-dev"
+
     summit_rhel_dev.vm.synced_folder ".", "/vagrant", disabled: true
-    summit_rhel_dev.vm.synced_folder ".", "/home/vagrant/sync", type: "rsync",
-                        rsync__exclude: [ ".git/", ".#*", "*~" ]
+    summit_rhel_dev.vm.synced_folder ".", "/home/vagrant/sync", disabled: true
+
+    #vagrant sync is not a fan of wildcards
+    summit_rhel_dev.vm.synced_folder "./workspace", "/root/workspace/", type: "rsync",
+                                    rsync__exclude: [ ".git/", ".#*", "*~" ]
+    summit_rhel_dev.vm.synced_folder "./lab1", "/root/Dockerfiles/lab1", type: "rsync",
+                                    rsync__exclude: [ ".git/", ".#*", "*~" ]
+    summit_rhel_dev.vm.synced_folder "./lab2", "/root/Dockerfiles/lab2", type: "rsync",
+                                    rsync__exclude: [ ".git/", ".#*", "*~" ]
+    summit_rhel_dev.vm.synced_folder "./lab3", "/root/Dockerfiles/lab3", type: "rsync",
+                                    rsync__exclude: [ ".git/", ".#*", "*~" ]
+    summit_rhel_dev.vm.synced_folder "./lab4", "/root/Dockerfiles/lab4", type: "rsync",
+                                    rsync__exclude: [ ".git/", ".#*", "*~" ]
+    summit_rhel_dev.vm.synced_folder "./lab5", "/root/Dockerfiles/lab5", type: "rsync",
+                                    rsync__exclude: [ ".git/", ".#*", "*~" ]
+    summit_rhel_dev.vm.synced_folder "./support_files", "/root/support_files", type: "rsync",
+                                    rsync__exclude: [ ".git/", ".#*", "*~" ]
+    summit_rhel_dev.vm.synced_folder "./answers", "/root/answers", type: "rsync",
+                                    rsync__exclude: [ ".git/", ".#*", "*~" ]
+    summit_rhel_dev.vm.synced_folder "../labs", "/root/markdown_lab_docs/", type: "rsync",
+                                    rsync__exclude: [ ".git/", ".#*", "*~" ]
 
     # we don't need to register this VM (going to use custom repos)
     if Vagrant.has_plugin?('vagrant-registration')
@@ -51,8 +90,8 @@ Vagrant.configure(2) do |config|
 
     #move files to the right dirs, this handles the sorta-local repo
     summit_rhel_dev.vm.provision 'shell', inline: "sudo rm -rf /etc/yum.repos.d/* && " \
-                                                  "sudo mv /home/vagrant/sync/local.repo /etc/yum.repos.d/"
-    summit_rhel_dev.vm.provision 'shell', inline: "sudo cat /home/vagrant/sync/hosts >> /etc/hosts"
+                                                  "sudo mv /root/support_files/local.repo /etc/yum.repos.d/"
+    summit_rhel_dev.vm.provision 'shell', inline: "sudo cat /root/support_files/hosts >> /etc/hosts"
     summit_rhel_dev.vm.provision 'shell', inline: "sudo yum clean all && sudo yum repolist"
 
     #perform update to pull updates from the repo we just added
@@ -69,8 +108,9 @@ Vagrant.configure(2) do |config|
     summit_rhel_dev.vm.provision 'shell', inline: "sudo chown root:docker /var/run/docker.sock"
 
     # setup for labs
-    summit_rhel_dev.vm.provision 'shell', inline: "sudo mkdir -vp /root/Dockerfiles && cp -Rv /home/vagrant/sync/lab* /root/Dockerfiles"
-    summit_rhel_dev.vm.provision 'shell', inline: "sudo cp -Rv /home/vagrant/sync/workspace* /root"
+    #moved these to vagrant rsync ^^^, remove this once confirmed
+#    summit_rhel_dev.vm.provision 'shell', inline: "sudo mkdir -vp /root/Dockerfiles && cp -Rv /home/vagrant/sync/lab* /root/Dockerfiles"
+#    summit_rhel_dev.vm.provision 'shell', inline: "sudo cp -Rv /home/vagrant/sync/workspace* /root"
 
     #pre-cache docker images
     summit_rhel_dev.vm.provision 'shell', inline: "docker pull rhel"
