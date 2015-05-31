@@ -32,9 +32,15 @@ EOF
 }
 
 __handle_db_host() {
-    # Update wp-config.php to point to our linked container's address.
-    sed -i -e "s/^\(define('DB_HOST', '\).*\(');.*\)/\1${DB_PORT#tcp://}\2/" \
-        /var/www/html/wp-config.php
+    if [ "$MARIADB_SERVICE_HOST" ]; then
+        # Update wp-config.php to point to our kubernetes service address.
+        sed -i -e "s/^\(define('DB_HOST', '\).*\(');.*\)/\1$MARIADB_SERVICE_HOST:$MARIADB_SERVICE_PORT\2/" \
+            /var/www/html/wp-config.php
+    else
+        # Update wp-config.php to point to our linked container's address.
+        sed -i -e "s/^\(define('DB_HOST', '\).*\(');.*\)/\1${DB_PORT#tcp://}\2/" \
+            /var/www/html/wp-config.php
+    fi
 }
 
 __httpd_perms() {
