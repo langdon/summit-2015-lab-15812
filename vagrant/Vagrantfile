@@ -61,6 +61,8 @@ Vagrant.configure(2) do |config|
     #pre-cache docker images
     summit_rhel_deploy_target.vm.provision 'shell', inline: "docker pull rhel"
     summit_rhel_deploy_target.vm.provision 'shell', inline: "docker pull projectatomic/atomicapp:0.1.1"
+    summit_rhel_deploy_target.vm.provision 'shell', inline: "docker pull projectatomic/mariadb-centos7-atomicapp"
+    summit_rhel_deploy_target.vm.provision 'shell', inline: "docker tag projectatomic/mariadb-centos7-atomicapp projectatomic/mariadb-atomicapp"
     summit_rhel_deploy_target.vm.provision 'shell', inline: "echo 'precaching complete'"
 
   end

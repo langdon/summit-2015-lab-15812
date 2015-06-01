@@ -19,12 +19,10 @@ In a production environment we still have several problems:
 
 In this section we package the Wordpress application as an Atomic App. To demonstrate the composite nature of Atomic apps we have pre-loaded the database Atomic app. In this model a partnering software vendor provides an Atomic app that is certified on Red Hat platforms. The Wordpress application will reference  and connect to the certified Atomic app database service.
 
-[insert image here]
-
 Copy the Nulecule template files to the workspace directory.
 
 ```
-cp -R /root/lab5/nulecule_template/* /root/workspace/atomicapp/.
+cp -R /root/lab5/nulecule_template/* /root/workspace/.
 ```
 
 Open the Nulecule template file in a text editor.
@@ -43,12 +41,12 @@ Open the Nulecule template file in a text editor.
         ...
         graph:
           - name: mariadb
-            source: "docker://summit-rhel-dev:5000/mariadb/atomicapp"
+            source: "docker://projectatomic/mariadb-atomicapp"
         ...
 
-1. Copy the Wordpress kubernetes files created in lab 4 into the `artifacts` directory. Since these are for the kubernetes providers we'll put them in a `kubernetes` sub-directory. This path will match the Nulecule template `- file:artifacts/kubernetes/` reference. Since it ends in a trailing "slash" (`/`) all files in the directory will be deployed.
+1. Copy the Wordpress kubernetes directory created in lab 4 into the `artifacts` directory. Since these are for the kubernetes providers we'll put them in a `kubernetes` sub-directory. This path will match the Nulecule template `- file:artifacts/kubernetes/` reference. Since it ends in a trailing "slash" (`/`) all files in the directory will be deployed.
 
-        cp /root/lab4/* /root/workspace/atomicapp/artifacts/kubernetes/.
+        cp -R ~/workspace/wordpress/kubernetes ~/workspace/artifacts/.
 
 1. Edit the Nulecule file to add parameters `db_user`, `db_pass`, `db_name`
 
@@ -69,9 +67,17 @@ Open the Nulecule template file in a text editor.
                 default: db_wordpress
         ...
 
-1. Edit the kubernetes files and replace parameter values to match the name of each parameter in the Nulecule file.
+1. Edit the kubernetes files and replace parameter values to match the name of each parameter in the Nulecule file. Strings that start with `$` will be replaced by parameter names.
 
-[FIXME]
+            ...
+            env:
+            - name: DBUSER
+              value: $db_user
+            - name: DBPASS
+              value: $db_pass
+            - name: DBNAME
+              value: $db_name
+            ...
 
 1. Edit the Nulecule file metadata section.
 
