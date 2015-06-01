@@ -251,12 +251,14 @@ kubectl get services
 
 Eventually, you should see:
 ```
-NEED TO INSERT EXAMPLE OUTPUT HERE
+### TODO: NEED TO INSERT EXAMPLE OUTPUT HERE
 ```
 
 Seemed awfully manual and ordered up there, didn't it? Just wait til Lab5 where we make it a lot less painful!
 
-TODO: CHECK IT IN A WEB BROWSER
+### TODO: CHECK IT IN A WEB BROWSER
+
+### TODO: add in deploy to atomic
 
 Now that we are satisfied that our containers and Kubernetes definitions work, let's try deploying it to a remote server.
 
@@ -315,3 +317,19 @@ kind: Config
 preferences: {}
 users: []
 ```
+
+### TODO: add in deploy to atomic
+
+________
+not sure if i am including this
+
+OK, so let's put the proof in the pudding! Find the wordpress container (we want to simulate an outage here, so we don't want to delete the pods or services) and knock it over. And, as soon as that completes (or even consider running it in the background) run docker ps on a loop and watch Kubernetes recreate it. You can also open the site in a web browser as a above and keep reloading to see the site go away and then come back. 
+
+```
+docker rm wordpress &
+watch -n 1 docker ps
+```
+
+TODO: add in "always make sure wp stays up with two instances of wp"?
+TODO: add in "db outage tolerance to wp container"?
+
