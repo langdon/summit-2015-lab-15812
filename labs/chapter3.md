@@ -157,9 +157,9 @@ Now we'll create the Wordpress Dockerfile.
 
         EXPOSE 80
 
-1. Add a `VOLUME` instruction for `/var/www/html`.
+1. Add a `VOLUME` instruction for Wordpress uploads.
 
-        VOLUME /var/www/html
+        VOLUME /var/www/html/wp-content/uploads
 
 1. Finish by adding the `CMD` instruction.
 
@@ -183,9 +183,9 @@ Now we are ready to build the images to test our Dockerfiles.
 1. Configure the local directories for persistent storage. We also need to change the SELinux context so the applications have permission to read and write to the directories.
 
         mkdir -p /var/lib/mariadb
-        mkdir -p /var/lib/wordpress
+        mkdir -p /var/lib/wp_uploads
         chcon -Rt svirt_sandbox_file_t /var/lib/mariadb
-        chcon -Rt svirt_sandbox_file_t /var/lib/wordpress
+        chcon -Rt svirt_sandbox_file_t /var/lib/wp_uploads
 
 1. Run the database image to confirm connectivity. It takes some time to discover all of the necessary `docker run` options.
   * `-d` to run in daemonized mode
@@ -202,33 +202,23 @@ Now we are ready to build the images to test our Dockerfiles.
 1. Test the Wordpress image to confirm connectivity. Additional run options:
   * `--link <name>:<alias>` to link to the database container
 
-            docker run -d -v /var/lib/wordpress:/var/www/html -p 80:80 --link mariadb:db --name wordpress wordpress
+            docker run -d -v /var/lib/wp_uploads:/var/www/html/wp-content/uploads -p 80:80 --link mariadb:db --name wordpress wordpress
             docker logs $(docker ps -ql)
-            ls -l /var/lib/wordpress
+            ls -l /var/lib/wp_uploads
             curl -L http://localhost
 
-1. Stop the containers now and remove them.
-
-            docker stop mariadb wordpress
-            docker rm mariadb wordpress
-            
 1. When we have a working `docker run` recipe add a `LABEL RUN` instruction towards the bottom of each Dockerfile above the CMD to prescribe how the image is to be run. This instruction will be used by the `atomic` CLI to run the image reliably. The environment variables `NAME` and `IMAGE` are used by atomic CLI.
-  * MariaDB
 
-            LABEL RUN docker run -d -v /var/lib/mysql:/var/lib/mysql  --name NAME -e DBUSER=${DBUSER} -e DBPASS={$DBPASS} -e DBNAME=${DBNAME} -e NAME=NAME -e IMAGE=IMAGE IMAGE
+        LABEL RUN docker run -d -v /var/lib/wp_uploads:/var/www/html/wp-content/uploads -p 80:80 --link=mariadb:db --name NAME -e NAME=NAME -e IMAGE=IMAGE IMAGE
 
-  * Wordpress
+1. Rebuild the Wordpress image. The image cache will be used so only the changes will need to be built.
 
-            LABEL RUN docker run -d -v /var/lib/wordpress:/var/www/html -p 80:80 --link=mariadb:db --name NAME -e NAME=NAME -e IMAGE=IMAGE IMAGE
-
-1. Rebuild the images. The image cache will be used so only the changes will need to be built.
-
-        docker build -t mariadb mariadb/
         docker build -t wordpress wordpress/
 
-1. Run the images using the `atomic` CLI and test using the methods from step 4.
+1. Re-run the Wordpress image using the `atomic` CLI and test using the methods from the earlier step.
 
-        atomic run mariadb
+        docker stop wordpress
+        docker rm wordpress
         atomic run wordpress
 
 1. Once satisfied with the images tag them with the URI of the local lab local registry

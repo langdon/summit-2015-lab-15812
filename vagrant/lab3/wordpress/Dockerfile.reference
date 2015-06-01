@@ -17,5 +17,5 @@ RUN rm /latest.tar.gz
 RUN chown -R apache:apache /var/www/
 
 EXPOSE 80
-VOLUME /var/www/html
+VOLUME /var/www/html/wp-content/uploads
 CMD ["/bin/bash", "/scripts/start.sh"]
