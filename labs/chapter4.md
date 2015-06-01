@@ -68,13 +68,13 @@ We specified the version of the Kubernetes api, the name of this pod (aka ```nam
 
 Generally speaking, this is the content you can copy and paste between pods, aside from the names and labels.
 
-Now, let's add the custom information regarding this particular container. To start, we will add the most basic information. Replace the ```containers:```
+Now, let's add the custom information regarding this particular container. To start, we will add the most basic information. Please be sure to replace "YOUR_LAB_DEV_MACHINE" with the name of your machine. Replace the ```containers:```
 
 ```
   containers:
   - capabilities: {}
     env:
-    image: summit-rhel-dev:5000/mariadb
+    image: YOUR_LAB_DEV_MACHINE:5000/mariadb
     name: mariadb
     ports:
     - containerPort: 3306
@@ -114,7 +114,7 @@ spec:
       value: mypassword
     - name: DBNAME
       value: mydb
-    image: summit-rhel-dev:5000/mariadb
+    image: YOUR_LAB_DEV_MACHINE:5000/mariadb
     name: mariadb
     ports:
     - containerPort: 3306
@@ -123,6 +123,8 @@ spec:
       limits:
         cpu: 100m
 ```
+Be sure to replace "YOUR_LAB_DEV_MACHINE" with the name of your machine if you jumped to this point in the lab.
+
 Our wordpress container is much less complex, so let's do that pod next.
 
 ```
@@ -146,14 +148,14 @@ spec:
       value: mypassword
     - name: DB_ENV_DBNAME
       value: mydb
-    image: summit-rhel-dev:5000/wordpress
+    image: YOUR_LAB_DEV_MACHINE:5000/wordpress
     name: wordpress
     ports:
     - containerPort: 80
       protocol: TCP
 ```
 
-A couple things to notice about this file. Obviously, we change all the appropriate names to reflect "wordpress" but, largely, it is the same as the mariadb pod file. We also use the environment variables that are specified by the wordpress container, although they need to get the same values as the ones in the mariadb pod. Lastly, just to show you aren't bound to the image or pod names, we also changed the ```labels``` value to "wpfronted".
+A couple things to notice about this file. Obviously, we change all the appropriate names to reflect "wordpress" but, largely, it is the same as the mariadb pod file. We also use the environment variables that are specified by the wordpress container, although they need to get the same values as the ones in the mariadb pod. Lastly, just to show you aren't bound to the image or pod names, we also changed the ```labels``` value to "wpfronted". Be sure to replace "YOUR_LAB_DEV_MACHINE" with the name of your machine as with the maria-pod.
 
 Ok, so, lets launch our pods and make sure they come up correctly. In order to do this, we need to introduce the ```kubectl``` command which is what drives Kubernetes. Generally, speaking, the format of ```kubectl``` commands is ```kubetctl <operation> <kind>```. Where ```<operation>``` is something like ```create```, ```get```, ```remove```, etc. and ```kind``` is the ```kind``` from the pod files.
 
@@ -251,14 +253,20 @@ kubectl get services
 
 Eventually, you should see:
 ```
-### TODO: NEED TO INSERT EXAMPLE OUTPUT HERE
+POD         IP            CONTAINER(S)   IMAGE(S)                         HOST                  LABELS            STATUS    CREATED
+mariadb     172.17.0.17   mariadb        summit-rhel-dev:5000/mariadb     127.0.0.1/127.0.0.1   name=mariadb      Running   11 hours
+wordpress   172.17.0.18   wordpress      summit-rhel-dev:5000/wordpress   127.0.0.1/127.0.0.1   name=wpfrontend   Running   11 hours
+```
+
+```
+NAME            LABELS                                    SELECTOR          IP               PORT(S)
+kubernetes      component=apiserver,provider=kubernetes   <none>            10.254.0.2       443/TCP
+kubernetes-ro   component=apiserver,provider=kubernetes   <none>            10.254.0.1       80/TCP
+mariadb         name=mariadb                              name=mariadb      10.254.252.125   3306/TCP
+wpfrontend      name=wpfrontend                           name=wpfrontend   10.254.127.139   80/TCP
 ```
 
 Seemed awfully manual and ordered up there, didn't it? Just wait til Lab5 where we make it a lot less painful!
-
-### TODO: CHECK IT IN A WEB BROWSER
-
-### TODO: add in deploy to atomic
 
 Now that we are satisfied that our containers and Kubernetes definitions work, let's try deploying it to a remote server.
 
@@ -291,7 +299,7 @@ kubectl config use-context local-context
 kubectl config view
 ```
 
-Strictly speaking, a lot of the above is not necessary, however, it is good to get in to the habit of using "contexts" then when you are using kubectl with properly configured security and the like, you will run in to less "mysterious" headaches trying to figure out why you can't deploy.
+Strictly speaking, a lot of the above is not necessary, however, it is good to get in to the habit of using "contexts" then when you are using ```kubectl``` with properly configured security and the like, you will run in to less "mysterious" headaches trying to figure out why you can't deploy.
 
 Now, lets test it out.
 ```
@@ -301,7 +309,11 @@ kubectl get services
 
 Did you get your pods and services back? If not, you should check your config. Your ```config view``` result should look like this:
 ```
-[root@summit-rhel-dev vagrant]# kubectl config view
+kubectl config view
+```
+Result:
+
+```
 apiVersion: v1
 clusters:
 - cluster:
@@ -318,9 +330,60 @@ preferences: {}
 users: []
 ```
 
-### TODO: add in deploy to atomic
+All right, let's switch to the remote, don't forget to replace YOUR_LAB_DEPLOY_MACHINE with the correct name:
+```
+kubectl config set-cluster remote --server=http://YOUR_LAB_DEPLOY_MACHINE:8080
+kubectl config set-context remote-context --cluster=remote
+kubectl config use-context remote-context
+kubectl config view
+```
+You should now have ```current-context: remote-context```. Now, let's prove we are talking to the remote:
+```
+kubectl get pods
+kubectl get services
+```
+Nothing there, right? Ok, so let's start the bits up on the remote, deployment server: 
+```
+kubectl create -f ~/workspace/mariadb/kubernetes/mariadb-pod.yaml
+kubectl create -f ~/workspace/mariadb/kubernetes/mariadb-service.yaml
+kubectl create -f ~/workspace/wordpress/kubernetes/wordpress-service.yaml
+kubectl create -f ~/workspace/wordpress/kubernetes/wordpress-pod.yaml
+```
+
+Now we should see similar results as our local machine from:
+```
+kubectl get pods
+kubectl get services
+```
+
+Now we can check to make sure the site is running by, first creating an ssh tunnel:
+```
+ssh -fND 11111 summit-rhel-deploy
+```
+
+We need to create a tunnel because in the lab environment we have to use subnets on the VMs for Kubernetes to work. Next, we have to configure FireFox to use the tunnel as a SOCKS proxy. To do that, go to Menu | Preferences | Advanced | Network | Connection Settings. Then choose "Manual Proxy Configuration," put in localhost for the SOCKS Host and 11111 for the Port. Click OK.
+
+Now we need the IP for the site:
+```
+kubectl get endpoints
+```
+Which should give you a result like:
+```
+NAME            ENDPOINTS
+kubernetes      192.168.121.102:6443
+kubernetes-ro   192.168.121.102:7080
+mariadb         172.17.0.17:3306
+wpfrontend      172.17.0.18:80
+```
+
+Now in your browser type in the IP for the "wpfrontend". The port is unnecessary because it is, nicely, on port 80.
+
+
 
 ________
+Now, let's move on to one more thing. One of the major reasons we wanted to introduce Kubernetes was for increased resiliency. Right now, we have Kubernetes recreating things 
+
+
 not sure if i am including this
 
 OK, so let's put the proof in the pudding! Find the wordpress container (we want to simulate an outage here, so we don't want to delete the pods or services) and knock it over. And, as soon as that completes (or even consider running it in the background) run docker ps on a loop and watch Kubernetes recreate it. You can also open the site in a web browser as a above and keep reloading to see the site go away and then come back. 
