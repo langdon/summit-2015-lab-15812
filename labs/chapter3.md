@@ -180,13 +180,21 @@ Now we are ready to build the images to test our Dockerfiles.
 
         docker images
 
+1. Configure the local directories for persistent storage. We also need to change the SELinux context so the applications have permission to read and write to the directories.
+
+        mkdir -p /var/lib/mariadb
+        mkdir -p /var/lib/wordpress
+        chcon -Rt svirt_sandbox_file_t /var/lib/mariadb
+        chcon -Rt svirt_sandbox_file_t /var/lib/wordpress
+
 1. Run the database image to confirm connectivity. It takes some time to discover all of the necessary `docker run` options.
   * `-d` to run in daemonized mode
   * `-v <host/path>:<container/path>` to bindmount the directory for persistent storage
   * `-p <host_port>:<container_port>` to map the container port to the host port
 
-            docker run -d -p 3306:3306 -e DBUSER=user -e DBPASS=mypassword -e DBNAME=mydb --name mariadb mariadb
+            docker run -d -v /var/lib/mariadb:/var/lib/msyql -p 3306:3306 -e DBUSER=user -e DBPASS=mypassword -e DBNAME=mydb --name mariadb mariadb
             docker logs $(docker ps -ql)
+            ls -l /var/lib/mariadb
             curl http://localhost:3306
 
   **Note**: the `curl` command does not return useful information but demonstrates a response on the port.
@@ -194,8 +202,9 @@ Now we are ready to build the images to test our Dockerfiles.
 1. Test the Wordpress image to confirm connectivity. Additional run options:
   * `--link <name>:<alias>` to link to the database container
 
-            docker run -d -p 80:80 --link mariadb:db --name wordpress wordpress
+            docker run -d -v /var/lib/wordpress:/var/www/html -p 80:80 --link mariadb:db --name wordpress wordpress
             docker logs $(docker ps -ql)
+            ls -l /var/lib/wordpress
             curl -L http://localhost
 
 1. Stop the containers now and remove them.
@@ -203,15 +212,14 @@ Now we are ready to build the images to test our Dockerfiles.
             docker stop mariadb wordpress
             docker rm mariadb wordpress
             
-
 1. When we have a working `docker run` recipe add a `LABEL RUN` instruction towards the bottom of each Dockerfile above the CMD to prescribe how the image is to be run. This instruction will be used by the `atomic` CLI to run the image reliably. The environment variables `NAME` and `IMAGE` are used by atomic CLI.
   * MariaDB
 
-            LABEL RUN docker run -d -v ${HOME}/mysql:/var/lib/mysql  --name NAME -e DBUSER=${DBUSER} -e DBPASS={$DBPASS} -e DBNAME=${DBNAME} -e NAME=NAME -e IMAGE=IMAGE IMAGE
+            LABEL RUN docker run -d -v /var/lib/mysql:/var/lib/mysql  --name NAME -e DBUSER=${DBUSER} -e DBPASS={$DBPASS} -e DBNAME=${DBNAME} -e NAME=NAME -e IMAGE=IMAGE IMAGE
 
   * Wordpress
 
-            LABEL RUN docker run -d -v ${HOME}/wordpress:/var/www/html -p 80:80 --link=mariadb:db --name NAME -e NAME=NAME -e IMAGE=IMAGE IMAGE
+            LABEL RUN docker run -d -v /var/lib/wordpress:/var/www/html -p 80:80 --link=mariadb:db --name NAME -e NAME=NAME -e IMAGE=IMAGE IMAGE
 
 1. Rebuild the images. The image cache will be used so only the changes will need to be built.
 
