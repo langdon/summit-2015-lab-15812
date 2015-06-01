@@ -378,21 +378,4 @@ wpfrontend      172.17.0.18:80
 
 Now in your browser type in the IP for the "wpfrontend". The port is unnecessary because it is, nicely, on port 80.
 
-
-
-________
-Now, let's move on to one more thing. One of the major reasons we wanted to introduce Kubernetes was for increased resiliency. Right now, we have Kubernetes recreating things 
-
-
-not sure if i am including this
-
-OK, so let's put the proof in the pudding! Find the wordpress container (we want to simulate an outage here, so we don't want to delete the pods or services) and knock it over. And, as soon as that completes (or even consider running it in the background) run docker ps on a loop and watch Kubernetes recreate it. You can also open the site in a web browser as a above and keep reloading to see the site go away and then come back. 
-
-```
-docker rm wordpress &
-watch -n 1 docker ps
-```
-
-TODO: add in "always make sure wp stays up with two instances of wp"?
-TODO: add in "db outage tolerance to wp container"?
-
+Ok, now you can move on to lab5, where Aaron will show you how to do this much more easily.
