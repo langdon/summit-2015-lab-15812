@@ -357,14 +357,7 @@ kubectl get pods
 kubectl get services
 ```
 
-Now we can check to make sure the site is running by, first creating an ssh tunnel. Open a new terminal on your host machine and run:
-```
-ssh -fND 11111 summit-rhel-deploy
-```
-
-We need to create a tunnel because in the lab environment we have to use subnets on the VMs for Kubernetes to work. Next, we have to configure FireFox to use the tunnel as a SOCKS proxy. To do that, go to Menu | Preferences | Advanced | Network | Connection Settings. Then choose "Manual Proxy Configuration," put in localhost for the SOCKS Host and 11111 for the Port. Click OK.
-
-Now we need the IP for the site:
+Now we can check to make sure the site is running. However, first we need the IP for it.
 ```
 kubectl get endpoints
 ```
@@ -377,6 +370,15 @@ mariadb         172.17.0.17:3306
 wpfrontend      172.17.0.18:80
 ```
 
-Now in your browser type in the IP for the "wpfrontend". The port is unnecessary because it is, nicely, on port 80.
+In order for this to work, we need to create a tunnel in to the deploy machine to proxy connections to the wordpress server. In order to do that we use the "wpfrontend endpoint" from above and insert it in to the following command which needs to be executed on the deploy machine:
+```
+ssh root@summit_rhel_deploy_target
+ssh -L *:9080:<WPFRONTEND_ENDPOINT>:80 root@localhost
+```
 
-Ok, now you can move on to lab5, where Aaron will show you how to do this much more easily.
+We need to create a tunnel because in the lab environment we have to use subnets on the VMs for Kubernetes to work. Now in your browser type in:
+```
+http://summit_rhel_deploy_target:9080
+```
+
+Ok, now you can move on to lab5, where Aaron will show you how to create an application much more easily.
