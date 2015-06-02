@@ -378,7 +378,7 @@ ssh -L *:9080:<WPFRONTEND_ENDPOINT>:80 root@localhost
 
 We need to create a tunnel because in the lab environment we have to use subnets on the VMs for Kubernetes to work. Now in your browser type in:
 ```
-http://summit_rhel_deploy_target:9080
+http://summit-rhel-deploy-target:9080
 ```
 
 Ok, now you can move on to lab5, where Aaron will show you how to create an application much more easily.
