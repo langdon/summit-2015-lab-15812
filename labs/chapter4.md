@@ -357,7 +357,7 @@ kubectl get pods
 kubectl get services
 ```
 
-Now we can check to make sure the site is running by, first creating an ssh tunnel:
+Now we can check to make sure the site is running by, first creating an ssh tunnel. Open a new terminal on your host machine and run:
 ```
 ssh -fND 11111 summit-rhel-deploy
 ```
