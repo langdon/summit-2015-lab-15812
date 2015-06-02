@@ -241,9 +241,9 @@ kubectl create -f ~/workspace/mariadb/kubernetes/mariadb-service.yaml
 
 Now let's start wordpress.
 ```
-kubectl create -f ~/workspace/wordpress/kubernetes/wordpress-service.yaml
 kubectl create -f ~/workspace/wordpress/kubernetes/wordpress-pod.yaml
-    ```
+kubectl create -f ~/workspace/wordpress/kubernetes/wordpress-service.yaml
+```
 
 OK, now let's make sure everything came up correctly:
 ```
