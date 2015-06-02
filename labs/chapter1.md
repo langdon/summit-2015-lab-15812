@@ -7,6 +7,7 @@ In this lab we will explore the docker environment. If you are familiar with doc
 
 * Check out the systemd unit file that starts Docker on our host and notice that it includes 3 EnvironmentFiles.  These files tell Docker how the Docker daemon, storage and networking should be set up and configured.  Take a look at those files too.  Specifically, in the /etc/sysconfig/docker check out the registry settings.  You may find it interesting that you can `ADD_REGISTRY` and `BLOCK_REGISTRY`.  Think about the different use cases for that.
 
+Perform the following commands as root unless instructed otherwise.
 
 ```
 # cat /usr/lib/systemd/system/docker.service
@@ -97,7 +98,7 @@ Here you can see in the `FROM` command that we are pulling a RHEL 7.1 base image
 * Next, let's run the image and make sure it started.
 
 ```
-# docker run -dt -p 80:80 redhat/apache
+# docker run -dt -p 80:80 --name apache redhat/apache
 # docker ps
 ```
 
@@ -116,7 +117,7 @@ Apache
 ## Time to Inspect
 
 ```
-# docker inspect <container id>
+# docker inspect apache
 ```
 
 We can see that this gives us quite a bit of information in json format.  We can scroll around and find the IP address, it will be towards the bottom.  
@@ -124,7 +125,7 @@ We can see that this gives us quite a bit of information in json format.  We can
 * Let's be more explicit with our `docker inspect`
 
 ```
-# docker inspect --format '{{ .NetworkSettings.IPAddress }}' <container id>
+# docker inspect --format '{{ .NetworkSettings.IPAddress }}' apache
 172.17.0.6
 ```
 
@@ -133,7 +134,7 @@ We can apply the same filter to any value in the json output.  Try a few differe
 * Now lets look inside the container and see what that environment looks like.  We first need to get the PID of the container so we can attach to the PID namespace with nsenter.  After we have the PID, go ahead and enter the namespaces of the container.  Take a look at the man page to understand all the flags we are passing to nsenter.
 
 ```
-# docker inspect --format '{{ .State.Pid }}' 04d4d9ef5c4a
+# docker inspect --format '{{ .State.Pid }}' apache
 15492
 
 # man nsenter
@@ -164,7 +165,7 @@ Exit the container namespace with `CTRL+d` or `exit`.
 In addition to using `nsenter` to enter the namespace of your container, you can also execute commands in that namespace with `docker exec`.  
 
 ```
-docker exec <container id> pwd
+docker exec apache pwd
 ```
 
 Whew, so we do have some options.  Now, remember that this lab is all about containerizing your existing apps.  You will need some of the tools listed above to go through the process of containerizing your apps. Troubleshooting problems when you are in a container is going to be something that you get very familiar with.
