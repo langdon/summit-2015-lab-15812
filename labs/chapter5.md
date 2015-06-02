@@ -15,19 +15,31 @@ In a production environment we still have several problems:
 1. How can we re-use common services such as a database so we don't have to re-write them every time?
 1. How can we support different deployment targets (docker, kubernetes, openshift, etc) managed by a single deployment unit?
 
+### Terms
+
+* **Nulecule**:
+* **Atomic app**:
+* **Provider**:
+* **Artifacts**:
+* **Graph**:
+
 ### Packaging Wordpress
 
 In this section we package the Wordpress application as an Atomic App. To demonstrate the composite nature of Atomic apps we have pre-loaded the database Atomic app. In this use case a partnering software vendor might provide an Atomic app that is certified on Red Hat platforms. The Wordpress application will reference  and connect to the certified Atomic app database service.
 
-Copy the Nulecule template files to the workspace directory.
+#### The Nulecule file
 
-```
-cp -R /root/lab5/nulecule_template/* /root/workspace/.
-```
+1. Copy the Nulecule template files to the workspace directory.
 
-Open the Nulecule template file in a text editor.
+        cp -R ~/lab5/nulecule_template/* ~/workspace/.
 
-1. Edit `name` for a database and wordpress graph component.
+1. Open the `~/workspace/Nulecule` template file in a text editor.
+
+        vi ~/workspace/Nulecule
+
+Take a look at the Nulecule file. There are two primary sections: metadata and graph. The graph is a list of components to deploy, like the database and wordpress services in our lab. The artifacts are a list of provider files to deploy. In this lab we have one provider, kubernetes, and the provider artifact files are the service and pod YAML files. The params section defines the parameters that may be changed when the application is deployed.
+
+1. In an editory edit the `name` key for each component in the Nulecule file. In this lab this is our database and wordpress services we've been working with.
 
         ...
         graph:
@@ -44,9 +56,13 @@ Open the Nulecule template file in a text editor.
             source: "docker://projectatomic/mariadb-atomicapp"
         ...
 
-1. Copy the Wordpress kubernetes directory created in lab 4 into the `artifacts` directory. Since these are for the kubernetes providers we'll put them in a `kubernetes` sub-directory. This path will match the Nulecule template `- file:artifacts/kubernetes/` reference. Since it ends in a trailing "slash" (`/`) all files in the directory will be deployed.
+1. Copy the Wordpress kubernetes directory created in lab 4 into the `artifacts` directory. Since these are for the kubernetes providers we'll put them in a `kubernetes` sub-directory. This path will match the Nulecule template `- file:artifacts/kubernetes/` reference. All files in this directory will be deployed.
 
         cp -R ~/workspace/wordpress/kubernetes ~/workspace/artifacts/.
+
+#### Parameters
+
+We want to allow some of the values in the kubernetes files to be changed at deployment time.
 
 1. Edit the Nulecule file to add parameters `db_user`, `db_pass`, `db_name`
 
@@ -67,7 +83,7 @@ Open the Nulecule template file in a text editor.
                 default: db_wordpress
         ...
 
-1. Edit the kubernetes files and replace parameter values to match the name of each parameter in the Nulecule file. Strings that start with `$` will be replaced by parameter names.
+1. We need to edit the kubernetes files so the values from the previous step can be replaced. Edit the pod file `~/workspace/artifacts/kubernetes/wordpress-pod.yaml` and replace parameter values to match the name of each parameter in the Nulecule file. Strings that start with `$` will be replaced by parameter names.
 
             ...
             env:
@@ -79,7 +95,15 @@ Open the Nulecule template file in a text editor.
               value: $db_name
             ...
 
-1. Edit the Nulecule file metadata section.
+#### Metadata
+
+The Nulecule specification provides a section for arbitrary metadata. For this lab we will simply change a few values for demonstration purposes.
+
+1. Edit the metadata section of the Nulecule file.
+
+        vi ~/workspace/Nulecule
+
+1. Edit the name and description fields.
 
         --- 
         specversion: "0.0.2"
@@ -94,19 +118,35 @@ Open the Nulecule template file in a text editor.
             and priceless at the same time.
 ...
 
+### Build and Deploy
+
+We will be packaging the atomic app as a container so it can be managed the same way.
+
 1. Build the Atomic app
 
-        docker build -t wordpress-rhel7-atomicapp .
+        docker build -t wordpress-rhel7-atomicapp ~/workspace/.
 
-1. Run the Atomic app in `--dry-run` mode, then run it for real to verify it works
+1. Run the Atomic app.
 
-        atomic run wordpress-rhel7-atomicapp --dry-run
+        atomic run wordpress-rhel7-atomicapp
 
-1. Check the deployment progress in the same way we did in lab 4.
+This will download the mariadb atomic app and deploy the databse to kubernetes. It will also deploy the wordpress pod and service. Check the deployment progress in the same way we did in lab 4.
 
-        kubectl get pods -w
+```
+kubectl get pods
+kubectl get services
+```
 
-1. When you're satisfied push the Atomic app to the registry
+The mariadb files were downloaded to the local directory.
 
-        docker tag wordpress-rhel7-atomicapp summit-rhel-dev/wordpress-rhel7-atomicapp
-        docker push summit-rhel-dev:5000/wordpress-rhel7-atomicapp
+```
+ls -l ~/workspace/mariadb
+```
+
+When you're satisfied push the Atomic app to the registry.
+
+```
+docker tag wordpress-rhel7-atomicapp summit-rhel-dev/wordpress-rhel7-atomicapp
+docker push summit-rhel-dev:5000/wordpress-rhel7-atomicapp
+```
+
