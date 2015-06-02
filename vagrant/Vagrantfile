@@ -121,13 +121,13 @@ Vagrant.configure(2) do |config|
 #    summit_rhel_dev.vm.provision 'shell', inline: "sudo cp -Rv /home/vagrant/sync/workspace* /root"
 
     #pre-cache docker images
-    summit_rhel_dev.vm.provision 'shell', inline: "docker pull rhel"
+    summit_rhel_dev.vm.provision 'shell', inline: "sudo docker pull rhel"
     #this is failing with an insecure self-signed cert error. works in vm interactively. for now let's tag the vm since it's the same
     #summit_rhel_dev.vm.provision 'shell', inline: "docker pull registry.access.redhat.com/rhel:7.1-6"
-    summit_rhel_dev.vm.provision 'shell', inline: "docker tag 65de4a13fc7c registry.access.redhat.com/rhel:7.1-6"
-    summit_rhel_dev.vm.provision 'shell', inline: "docker pull projectatomic/atomicapp:0.1.1"
-    summit_rhel_dev.vm.provision 'shell', inline: "docker pull projectatomic/mariadb-centos7-atomicapp"
-    summit_rhel_dev.vm.provision 'shell', inline: "docker tag projectatomic/mariadb-centos7-atomicapp projectatomic/mariadb-atomicapp"
+    summit_rhel_dev.vm.provision 'shell', inline: "sudo docker tag 65de4a13fc7c registry.access.redhat.com/rhel:7.1-6"
+    summit_rhel_dev.vm.provision 'shell', inline: "sudo docker pull projectatomic/atomicapp:0.1.1"
+    summit_rhel_dev.vm.provision 'shell', inline: "sudo docker pull projectatomic/mariadb-centos7-atomicapp"
+    summit_rhel_dev.vm.provision 'shell', inline: "sudo docker tag projectatomic/mariadb-centos7-atomicapp projectatomic/mariadb-atomicapp"
 
     #adding maria clinet for easier debugging
     summit_rhel_dev.vm.provision 'shell', inline: "sudo yum -y install mariadb"
