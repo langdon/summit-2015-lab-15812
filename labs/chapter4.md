@@ -11,7 +11,7 @@ Let's start with a little experimentation. I am sure you are all excited about y
 So, let's see what will happen. Launch the site:
 
 ```
-docker run -d -p 3306:3306 -e DBUSER=user -e DBPASS=mypassword -e DBNAME=mydb --name mariadb mariadb-pod
+docker run -d -p 3306:3306 -e DBUSER=user -e DBPASS=mypassword -e DBNAME=mydb --name mariadb mariadb
 docker run -d -p 80:80 --link mariadb:db wordpress
 ```
 **Note** if you get an error about the names in use, just delete those containers with ```docker rm <name>```
