@@ -209,11 +209,16 @@ Now we are ready to build the images to test our Dockerfiles.
             docker run -d -v /var/lib/wp_uploads:/var/www/html/wp-content/ -p 80:80 --link mariadb:db --name wordpress wordpress
             docker logs $(docker ps -ql)
             ls -l /var/lib/wp_uploads
+            docker ps
             curl -L http://localhost
 
-#### The atomic CLI
+You may also load the Wordpress application in a browser to test full functionality.
 
-When we have a working `docker run` recipe add a `LABEL RUN` instruction towards the bottom of each Dockerfile above the CMD to prescribe how the image is to be run. In addition to providing informative human-readable metadata, `LABEL`s may be used by the `atomic` CLI to run an image the way a developer designed it to run. This avoids having to copy+paste from README files. The `atomic` tool is installed on both RHEL and Atomic hosts. It is useful in controlling the Atomic host as well as running containers. The environment variables `NAME` and `IMAGE` are used by atomic CLI to provide metadata in the container.
+#### Simplify running containers with the atomic CLI
+
+When we have a working `docker run` recipe we want a way to communicate that to the end-user. The `atomic` tool is installed on both RHEL and Atomic hosts. It is useful in controlling the Atomic host as well as running containers. It is able to parse the `LABEL` instruction in a `Dockerfile`. The `LABEL RUN` instruction prescribes how the image is to be run. In addition to providing informative human-readable metadata, `LABEL`s may be used by the `atomic` CLI to run an image the way a developer designed it to run. This avoids having to copy+paste from README files.
+
+1. Edit `wordpress/Dockerfile` and add the following instruction near the bottom of the file above the CMD line.
 
         LABEL RUN docker run -d -v /var/lib/wp_uploads:/var/www/html/wp-content/ -p 80:80 --link=mariadb:db --name NAME -e NAME=NAME -e IMAGE=IMAGE IMAGE
 
@@ -221,7 +226,7 @@ When we have a working `docker run` recipe add a `LABEL RUN` instruction towards
 
         docker build -t wordpress wordpress/
 
-1. Re-run the Wordpress image using the `atomic` CLI and test using the methods from the earlier step.
+1. Re-run the Wordpress image using the `atomic` CLI. We don't need to use complicated, error-prone `docker run` string. Test using the methods from the earlier step.
 
         docker stop wordpress
         docker rm wordpress
