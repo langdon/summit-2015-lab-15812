@@ -347,8 +347,8 @@ Nothing there, right? Ok, so let's start the bits up on the remote, deployment s
 ```
 kubectl create -f ~/workspace/mariadb/kubernetes/mariadb-pod.yaml
 kubectl create -f ~/workspace/mariadb/kubernetes/mariadb-service.yaml
-kubectl create -f ~/workspace/wordpress/kubernetes/wordpress-service.yaml
 kubectl create -f ~/workspace/wordpress/kubernetes/wordpress-pod.yaml
+kubectl create -f ~/workspace/wordpress/kubernetes/wordpress-service.yaml
 ```
 
 Now we should see similar results as our local machine from:
