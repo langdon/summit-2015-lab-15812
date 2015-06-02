@@ -5,7 +5,7 @@ Environment
 To set up the entire environment from F21 install packages (along with deps):
 
 ```
-yum install -y vagrant vagrant-libvirt ruby-devel gcc-g++
+yum install -y vagrant vagrant-libvirt ruby-devel gcc-g++ libvirt-devel
 ```
 
 If libvirt was installed you may need to enable/start the service:
