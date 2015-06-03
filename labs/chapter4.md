@@ -352,23 +352,23 @@ Nothing there, right? Ok, so let's start the bits up on the remote, deployment s
 
 Open the new service file ~/workspace/wordpress/kubernetes/wordpress-service-remote.yaml and insert:
 ```
- kind: Service
- apiVersion: v1beta3
- id: wpfrontend
- metadata:
-   labels:
-     name: wpfrontend
-   name: wpfrontend
- spec:
-   ports:
-   - port: 80
-     protocol: TCP
-     targetPort: 80
-   selector:
-     name: wpfrontend
-   publicIPs:
-   - 192.168.135.3
- containerPort: 80
+kind: Service
+apiVersion: v1beta3
+id: wpfrontend
+metadata:
+  labels:
+    name: wpfrontend
+  name: wpfrontend
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    name: wpfrontend
+  publicIPs:
+  - 192.168.135.3
+containerPort: 80
 ```
 
 
