@@ -98,11 +98,11 @@ We need to edit the kubernetes files so the values from the previous step can be
 
             ...
             env:
-            - name: DBUSER
+            - name: DB_ENV_DBUSER
               value: $db_user
-            - name: DBPASS
+            - name: DB_ENV_DBPASS
               value: $db_pass
-            - name: DBNAME
+            - name: DB_ENV_DBNAME
               value: $db_name
             ...
 
