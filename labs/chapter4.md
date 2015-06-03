@@ -356,7 +356,10 @@ kubectl get services
 ```
 Nothing there, right? Ok, so let's start the bits up on the remote, deployment server.  Before we do that, we need to change the publicIP address in the service file so that it uses the IP address on the remote host that we are going to deploy the pod onto.
 
-Open the new service file ~/workspace/wordpress/kubernetes/wordpress-service-remote.yaml and insert:
+Open the new service file and put the following definition in it. 
+
+vi ~/workspace/wordpress/kubernetes/wordpress-service-remote.yaml 
+
 ```
 kind: Service
 apiVersion: v1beta3
