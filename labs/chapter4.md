@@ -69,13 +69,13 @@ We specified the version of the Kubernetes api, the name of this pod (aka ```nam
 
 Generally speaking, this is the content you can copy and paste between pods, aside from the names and labels.
 
-Now, let's add the custom information regarding this particular container. To start, we will add the most basic information. Please be sure to replace "YOUR_LAB_DEV_MACHINE" with the name of your machine. Replace the ```containers:```
+Now, let's add the custom information regarding this particular container. To start, we will add the most basic information. Please be sure to replace "192.168.135.2" with the name of your machine. Replace the ```containers:```
 
 ```
   containers:
   - capabilities: {}
     env:
-    image: YOUR_LAB_DEV_MACHINE:5000/mariadb
+    image: 192.168.135.2:5000/mariadb
     name: mariadb
     ports:
     - containerPort: 3306
@@ -115,7 +115,7 @@ spec:
       value: mypassword
     - name: DBNAME
       value: mydb
-    image: YOUR_LAB_DEV_MACHINE:5000/mariadb
+    image: 192.168.135.2:5000/mariadb
     name: mariadb
     ports:
     - containerPort: 3306
@@ -124,7 +124,7 @@ spec:
       limits:
         cpu: 100m
 ```
-Be sure to replace "YOUR_LAB_DEV_MACHINE" with the name of your machine if you jumped to this point in the lab.
+Be sure to replace "192.168.135.2" with the name of your machine if you jumped to this point in the lab.
 
 Our wordpress container is much less complex, so let's do that pod next.
 
@@ -149,14 +149,14 @@ spec:
       value: mypassword
     - name: DB_ENV_DBNAME
       value: mydb
-    image: YOUR_LAB_DEV_MACHINE:5000/wordpress
+    image: 192.168.135.2:5000/wordpress
     name: wordpress
     ports:
     - containerPort: 80
       protocol: TCP
 ```
 
-A couple things to notice about this file. Obviously, we change all the appropriate names to reflect "wordpress" but, largely, it is the same as the mariadb pod file. We also use the environment variables that are specified by the wordpress container, although they need to get the same values as the ones in the mariadb pod. Lastly, just to show you aren't bound to the image or pod names, we also changed the ```labels``` value to "wpfronted". Be sure to replace "YOUR_LAB_DEV_MACHINE" with the name of your machine as with the maria-pod.
+A couple things to notice about this file. Obviously, we change all the appropriate names to reflect "wordpress" but, largely, it is the same as the mariadb pod file. We also use the environment variables that are specified by the wordpress container, although they need to get the same values as the ones in the mariadb pod. Lastly, just to show you aren't bound to the image or pod names, we also changed the ```labels``` value to "wpfronted". 
 
 Ok, so, lets launch our pods and make sure they come up correctly. In order to do this, we need to introduce the ```kubectl``` command which is what drives Kubernetes. Generally, speaking, the format of ```kubectl``` commands is ```kubetctl <operation> <kind>```. Where ```<operation>``` is something like ```create```, ```get```, ```remove```, etc. and ```kind``` is the ```kind``` from the pod files.
 
