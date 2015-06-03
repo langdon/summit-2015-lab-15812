@@ -70,7 +70,7 @@ We specified the version of the Kubernetes api, the name of this pod (aka ```nam
 
 Generally speaking, this is the content you can copy and paste between pods, aside from the names and labels.
 
-Now, let's add the custom information regarding this particular container. To start, we will add the most basic information. Please be sure to replace "YOUR_LAB_DEV_MACHINE" with the name of your machine. Replace the ```containers:```
+Now, let's add the custom information regarding this particular container. To start, we will add the most basic information. 
 
 ```
   containers:
