@@ -1,4 +1,4 @@
-## LAB 3: Deconstructing an application into microservices (Aaron)
+## LAB 3: Deconstructing an application into microservices
 
 In this lab you will deconstruct an application into microservices, creating a multi-container application. In this process we explore the challenges of networking, storage and configuration.
 

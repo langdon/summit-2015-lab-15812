@@ -1,4 +1,4 @@
-## LAB 2: Analyzing a Monolithic Application (Dusty)
+## LAB 2: Analyzing a Monolithic Application
 
 Typically it is best to break down services into the simplest
 components and then containerize each of them independently. However,
