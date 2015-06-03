@@ -1,13 +1,13 @@
 --- 
-specversion: "0.0.2"
+specversion: 0.0.2
 
 id: 191131-abcd
 metadata: 
-  name: "my app"
+  name: my app
   appversion: v1.0.0
-  description: "some application"
+  description: some application
   license: 
-    name: "Apache 2.0"
+    name: Apache 2.0
     url: www.example.com/license
 
 graph: 
@@ -16,14 +16,11 @@ graph:
   - name: mycode
     artifacts: 
       kubernetes: 
-        - file:artifacts/kubernetes
+        - file:artifacts/kubernetes/pod.json
     params: 
       - name: password
         description: passphrase
       - name: username
-        constraints: 
-          - allowed_pattern: "[A-Z0-9]+"
-            description: "Must consist of characters and numbers only."
         description: username
         default: admin
 

@@ -17,11 +17,11 @@ In a production environment we still have several problems:
 
 ### Terms
 
-* **Nulecule**:
-* **Atomic app**:
-* **Provider**:
-* **Artifacts**:
-* **Graph**:
+* **Nulecule**: Nulecule is a specification that defines a pattern and model for packaging complex multi-container applications, referencing all their dependencies, including orchestration metadata in a container image for building, deploying, monitoring, and active management.
+* **Atomic app**: An implementation of the Nulecule specification. Atomic app supports running applications packaged as a Nulecule.
+* **Provider**: Plugin interface for specific deployment platform, an orchestration provider
+* **Artifacts**: Provider files
+* **Graph**: Declarative representation of dependencies in the context of a multi-container Nulecule application
 
 ### Packaging Wordpress
 
@@ -53,12 +53,19 @@ Take a look at the Nulecule file. There are two primary sections: metadata and g
         ...
         graph:
           - name: mariadb
-            source: "docker://projectatomic/mariadb-atomicapp"
+            source: "docker://mariadb-atomicapp"
         ...
 
-1. Copy the Wordpress kubernetes directory created in lab 4 into the `artifacts` directory. Since these are for the kubernetes providers we'll put them in a `kubernetes` sub-directory. This path will match the Nulecule template `- file:artifacts/kubernetes/` reference. All files in this directory will be deployed.
+1. Copy the Wordpress kubernetes directory created in lab 4 into the `artifacts` directory. Since these are for the kubernetes provider we'll put them in a `kubernetes` sub-directory.
 
         cp -R ~/workspace/wordpress/kubernetes ~/workspace/artifacts/.
+
+1. Add a path to each kubernetes file in the Nulecule file as a list of files to be deployed.
+
+            artifacts:
+              kubernetes:
+                - file://artifacts/kubernetes/wordpress-pod.yaml
+                - file://artifacts/kubernetes/wordpress-service.yaml
 
 #### Parameters
 
@@ -77,7 +84,6 @@ We want to allow some of the values in the kubernetes files to be changed at dep
                 default: wp_user
               - name: db_pass
                 description: wordpress database password
-                hidden: true
               - name: db_name
                 description: wordpress database name
                 default: db_wordpress
@@ -126,27 +132,31 @@ We will be packaging the atomic app as a container so it can be managed the same
 
         docker build -t wordpress-rhel7-atomicapp ~/workspace/.
 
-1. Run the Atomic app.
+1. Change to a temporary directory so we can see the files that are unpacked during the deployment. Run the Atomic app.
 
+        cd /tmp
         atomic run wordpress-rhel7-atomicapp
 
-This will download the mariadb atomic app and deploy the databse to kubernetes. It will also deploy the wordpress pod and service. Check the deployment progress in the same way we did in lab 4.
+You will be prompted for each parameter. Where default parameters are provided you may press `enter`. The mariadb atomic app should be downloaded. The wordpress and database pods and services should be deployed to kubernetes. By default the deployment is in debug mode so expect a lot of terminal output.
+
+Check the deployment progress in the same way we did in lab 4.
 
 ```
 kubectl get pods
 kubectl get services
 ```
 
-The mariadb files were downloaded to the local directory.
+The wordpress files were downloaded to the local directory. The mariadb files are placed in an `external` directory.
 
 ```
-ls -l ~/workspace/mariadb
+ls -l /tmp
+ls -l /tmp/external
 ```
 
-When you're satisfied push the Atomic app to the registry.
+View the sample answerfile.
 
 ```
-docker tag wordpress-rhel7-atomicapp summit-rhel-dev/wordpress-rhel7-atomicapp
-docker push summit-rhel-dev:5000/wordpress-rhel7-atomicapp
+cat answers.conf.sample
 ```
 
+This may be renamed `answers.conf` and used for future unattended deployments.
