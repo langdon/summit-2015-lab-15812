@@ -268,9 +268,15 @@ wordpress   172.17.0.2   wordpress      summit-rhel-dev:5000/wordpress   127.0.0
 NAME            LABELS                                    SELECTOR          IP               PORT(S)
 kubernetes      component=apiserver,provider=kubernetes   <none>            10.254.0.2       443/TCP
 kubernetes-ro   component=apiserver,provider=kubernetes   <none>            10.254.0.1       80/TCP
-mariadb         name=mariadb                              name=mariadb      10.254.199.191   3306/TCP
-wpfrontend      name=wpfrontend                           name=wpfrontend   10.254.202.179   80/TCP
+mariadb         name=mariadb                              name=mariadb      10.254.200.116   3306/TCP
+wpfrontend      name=wpfrontend                           name=wpfrontend   10.254.177.85    80/TCP
+                                                                            192.168.135.2
 ```
+
+Check and make sure you can access the wordpress frontend service that we created.
+
+curl -L http://192.168.135.2
+
 
 Seemed awfully manual and ordered up there, didn't it? Just wait til Lab5 where we make it a lot less painful!
 
@@ -336,9 +342,9 @@ preferences: {}
 users: []
 ```
 
-All right, let's switch to the remote, don't forget to replace YOUR_LAB_DEPLOY_MACHINE with the correct name:
+All right, let's switch to the remote.
 ```
-kubectl config set-cluster remote --server=http://YOUR_LAB_DEPLOY_MACHINE:8080
+kubectl config set-cluster remote --server=http://192.168.135.3:8080
 kubectl config set-context remote-context --cluster=remote
 kubectl config use-context remote-context
 kubectl config view
@@ -350,31 +356,29 @@ kubectl get services
 ```
 Nothing there, right? Ok, so let's start the bits up on the remote, deployment server.  Before we do that, we need to change the publicIP address in the service file so that it uses the IP address on the remote host that we are going to deploy the pod onto.
 
-Open the new service file ~/workspace/wordpress/kubernetes/wordpress-service-remote.yaml and insert:
+Open the new service file and put the following definition in it. 
+
+vi ~/workspace/wordpress/kubernetes/wordpress-service-remote.yaml 
+
 ```
- kind: Service
- apiVersion: v1beta3
- id: wpfrontend
- metadata:
-   labels:
-     name: wpfrontend
-   name: wpfrontend
- spec:
-   ports:
-   - port: 80
-     protocol: TCP
-     targetPort: 80
-   selector:
-     name: wpfrontend
-   publicIPs:
-   - 192.168.135.3
- containerPort: 80
+kind: Service
+apiVersion: v1beta3
+id: wpfrontend
+metadata:
+  labels:
+    name: wpfrontend
+  name: wpfrontend
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    name: wpfrontend
+  publicIPs:
+  - 192.168.135.3
+containerPort: 80
 ```
-
-
-
-
-
 
  
 ```
