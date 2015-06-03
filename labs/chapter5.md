@@ -39,7 +39,7 @@ In this section we package the Wordpress application as an Atomic App. To demons
 
 Take a look at the Nulecule file. There are two primary sections: metadata and graph. The graph is a list of components to deploy, like the database and wordpress services in our lab. The artifacts are a list of provider files to deploy. In this lab we have one provider, kubernetes, and the provider artifact files are the service and pod YAML files. The params section defines the parameters that may be changed when the application is deployed.
 
-1. In an editory edit the `name` key for each component in the Nulecule file. In this lab this is our database and wordpress services we've been working with.
+1. Open the Nulecule file in an editor. Edit the `name` key for each component in the Nulecule file. In this lab this is our database and wordpress services we've been working with.
 
         ...
         graph:
@@ -69,9 +69,7 @@ Take a look at the Nulecule file. There are two primary sections: metadata and g
 
 #### Parameters
 
-We want to allow some of the values in the kubernetes files to be changed at deployment time.
-
-1. Edit the Nulecule file to add parameters `db_user`, `db_pass`, `db_name`
+We want to allow some of the values in the kubernetes files to be changed at deployment time. Edit the Nulecule file to add parameters `db_user`, `db_pass`, `db_name`
 
         ...
           - name: wordpress
@@ -89,7 +87,11 @@ We want to allow some of the values in the kubernetes files to be changed at dep
                 default: db_wordpress
         ...
 
-1. We need to edit the kubernetes files so the values from the previous step can be replaced. Edit the pod file `~/workspace/artifacts/kubernetes/wordpress-pod.yaml` and replace parameter values to match the name of each parameter in the Nulecule file. Strings that start with `$` will be replaced by parameter names.
+That completes the Nulefule file work. Be sure to check your work against the reference file for this lab in `~/workspace/Nulecule.reference`.
+
+#### Provider files
+
+We need to edit the kubernetes files so the values from the previous step can be replaced. Edit the pod file `~/workspace/artifacts/kubernetes/wordpress-pod.yaml` and replace parameter values to match the name of each parameter in the Nulecule file. Strings that start with `$` will be replaced by parameter names.
 
             ...
             env:
@@ -137,7 +139,15 @@ We will be packaging the atomic app as a container so it can be managed the same
         cd /tmp
         atomic run wordpress-rhel7-atomicapp
 
-You will be prompted for each parameter. Where default parameters are provided you may press `enter`. The mariadb atomic app should be downloaded. The wordpress and database pods and services should be deployed to kubernetes. By default the deployment is in debug mode so expect a lot of terminal output.
+1. You will be prompted for each parameter. Where default parameters are provided you may press `enter`. Parameters you will need:
+
+  * wordpress image: `192.168.135.2:5000/wordpress`
+  * mariadb image: `192.168.135.2:5000/mariadb`
+  * database password: your choice
+  * db_name: default `[enter]`
+  * db_user: default `[enter]`
+
+The mariadb atomic app should be downloaded. The wordpress and database pods and services should be deployed to kubernetes. By default the deployment is in debug mode so expect a lot of terminal output.
 
 Check the deployment progress in the same way we did in lab 4.
 
