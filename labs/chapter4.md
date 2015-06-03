@@ -342,9 +342,9 @@ preferences: {}
 users: []
 ```
 
-All right, let's switch to the remote, don't forget to replace YOUR_LAB_DEPLOY_MACHINE with the correct name:
+All right, let's switch to the remote.
 ```
-kubectl config set-cluster remote --server=http://YOUR_LAB_DEPLOY_MACHINE:8080
+kubectl config set-cluster remote --server=http://192.168.135.3:8080
 kubectl config set-context remote-context --cluster=remote
 kubectl config use-context remote-context
 kubectl config view
