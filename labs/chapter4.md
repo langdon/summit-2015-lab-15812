@@ -268,9 +268,15 @@ wordpress   172.17.0.2   wordpress      summit-rhel-dev:5000/wordpress   127.0.0
 NAME            LABELS                                    SELECTOR          IP               PORT(S)
 kubernetes      component=apiserver,provider=kubernetes   <none>            10.254.0.2       443/TCP
 kubernetes-ro   component=apiserver,provider=kubernetes   <none>            10.254.0.1       80/TCP
-mariadb         name=mariadb                              name=mariadb      10.254.199.191   3306/TCP
-wpfrontend      name=wpfrontend                           name=wpfrontend   10.254.202.179   80/TCP
+mariadb         name=mariadb                              name=mariadb      10.254.200.116   3306/TCP
+wpfrontend      name=wpfrontend                           name=wpfrontend   10.254.177.85    80/TCP
+                                                                            192.168.135.2
 ```
+
+Check and make sure you can access the wordpress frontend service that we created.
+
+curl -L http://192.168.135.2
+
 
 Seemed awfully manual and ordered up there, didn't it? Just wait til Lab5 where we make it a lot less painful!
 
@@ -370,11 +376,6 @@ spec:
   - 192.168.135.3
 containerPort: 80
 ```
-
-
-
-
-
 
  
 ```
