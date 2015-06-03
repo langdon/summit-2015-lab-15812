@@ -1,4 +1,4 @@
-## LAB 4: Orchestrated deployment of a decomposed application (Langdon)
+## LAB 4: Orchestrated deployment of a decomposed application 
 
 In this lab we introduce how to orchestrate a multi-container application in Kubernetes.
 
