@@ -56,11 +56,11 @@ Take a look at the Nulecule file. There are two primary sections: metadata and g
             source: "docker://mariadb-atomicapp"
         ...
 
-1. Copy the Wordpress kubernetes directory created in lab 4 into the `artifacts` directory. Since these are for the kubernetes provider we'll put them in a `kubernetes` sub-directory.
+1. Save and close the Nulecule file. Copy the Wordpress kubernetes directory created in lab 4 into the `artifacts` directory. Since these are for the kubernetes provider we'll put them in a `kubernetes` sub-directory.
 
         cp -R ~/workspace/wordpress/kubernetes ~/workspace/artifacts/.
 
-1. Add a path to each kubernetes file in the Nulecule file as a list of files to be deployed.
+1. Open the Nulecule file in an editor. Add a path to each kubernetes file in the Nulecule file as a list of files to be deployed. Replace the `kubernetes:` section with the two file references.
 
             artifacts:
               kubernetes:
@@ -69,14 +69,13 @@ Take a look at the Nulecule file. There are two primary sections: metadata and g
 
 #### Parameters
 
-We want to allow some of the values in the kubernetes files to be changed at deployment time. Edit the Nulecule file to add parameters `db_user`, `db_pass`, `db_name`
+We want to allow some of the values in the kubernetes files to be changed at deployment time. Edit the Nulecule file to add the following parameters. Items without a default value will require input during deployment time. Replace the contents of the `params:` section with the list of parameters.
 
         ...
           - name: wordpress
             params:
               - name: image
                 description: wordpress docker image
-                default: wordpress
               - name: db_user 
                 description: wordpress database username
                 default: wp_user
@@ -85,13 +84,17 @@ We want to allow some of the values in the kubernetes files to be changed at dep
               - name: db_name
                 description: wordpress database name
                 default: db_wordpress
+              - name: publicip 
+                description: wordpress frontend public IP address
         ...
 
-That completes the Nulefule file work. Be sure to check your work against the reference file for this lab in `~/workspace/Nulecule.reference`.
+Save and close the Nulecule file.
 
 #### Provider files
 
-We need to edit the kubernetes files so the values from the previous step can be replaced. Edit the pod file `~/workspace/artifacts/kubernetes/wordpress-pod.yaml` and replace parameter values to match the name of each parameter in the Nulecule file. Strings that start with `$` will be replaced by parameter names.
+We need to edit the kubernetes files so the values from the previous step can be replaced.
+
+1. Edit the pod file `~/workspace/artifacts/kubernetes/wordpress-pod.yaml` and replace parameter values to match the name of each parameter in the Nulecule file. Strings that start with `$` will be replaced by parameter names: `$db_user`, `$db_pass`, `$db_name`
 
             ...
             env:
@@ -103,20 +106,23 @@ We need to edit the kubernetes files so the values from the previous step can be
               value: $db_name
             ...
 
+1. Edit the Wordpress service file `~/workspace/artifacts/kubernetes/wordpress-service.yaml`. Change the publicIPs value to `$publicip`.
+
+        ...
+           publicIPs: 
+           - $publicip
+        ...
+
 #### Metadata
 
 The Nulecule specification provides a section for arbitrary metadata. For this lab we will simply change a few values for demonstration purposes.
 
-1. Edit the metadata section of the Nulecule file.
-
-        vi ~/workspace/Nulecule
-
-1. Edit the name and description fields.
+Open the Nulecule file in an editor. Edit the metadata section of the Nulecule file, changing the name and description fields.
 
         --- 
         specversion: "0.0.2"
 
-        id: summit2015-lab
+        id: summit-2015-wp
         metadata: 
           name: Wordpress
           appversion: v1.0.0
@@ -126,26 +132,34 @@ The Nulecule specification provides a section for arbitrary metadata. For this l
             and priceless at the same time.
 ...
 
+Save and close the file.
+
+That completes the Nulecule file work. You can check your work against the reference file for this lab in `~/workspace/Nulecule.reference`.
+
+```
+diff ~/workspace/Nulecule ~/workspace/Nulecule.reference
+```
+
 ### Build and Deploy
 
-We will be packaging the atomic app as a container so it can be managed the same way.
+We will be packaging the atomic app as a container. This way there is no "out of band" metadata mangement channel: everything is a container.
 
-1. Build the Atomic app
+1. Build the Atomic app. We will use the standard Dockerfile for atomic app.
 
         docker build -t wordpress-rhel7-atomicapp ~/workspace/.
 
 1. Change to a temporary directory so we can see the files that are unpacked during the deployment. Run the Atomic app.
 
         cd /tmp
+        ls
         atomic run wordpress-rhel7-atomicapp
 
 1. You will be prompted for each parameter. Where default parameters are provided you may press `enter`. Parameters you will need:
 
   * wordpress image: `192.168.135.2:5000/wordpress`
   * mariadb image: `192.168.135.2:5000/mariadb`
-  * database password: your choice
-  * db_name: default `[enter]`
-  * db_user: default `[enter]`
+  * database password: your choice. NOTE: you'll be prompted twice, once for db and wordpress pods.
+  * public IP: `192.168.135.3`
 
 The mariadb atomic app should be downloaded. The wordpress and database pods and services should be deployed to kubernetes. By default the deployment is in debug mode so expect a lot of terminal output.
 
@@ -154,6 +168,7 @@ Check the deployment progress in the same way we did in lab 4.
 ```
 kubectl get pods
 kubectl get services
+kubectl get endpoints
 ```
 
 The wordpress files were downloaded to the local directory. The mariadb files are placed in an `external` directory.
