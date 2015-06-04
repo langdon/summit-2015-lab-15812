@@ -140,13 +140,45 @@ That completes the Nulecule file work. You can check your work against the refer
 diff ~/workspace/Nulecule ~/workspace/Nulecule.reference
 ```
 
-### Build and Deploy
+### Build
 
 We will be packaging the atomic app as a container. This way there is no "out of band" metadata mangement channel: everything is a container.
 
-1. Build the Atomic app. We will use the standard Dockerfile for atomic app.
+Build the Atomic app. We will use the standard Dockerfile for atomic app.
 
-        docker build -t wordpress-rhel7-atomicapp ~/workspace/.
+```
+docker build -t wordpress-rhel7-atomicapp ~/workspace/.
+```
+
+Before we test our work let's make sure our Kubernetes environment is setup correctly from the previous lab.
+
+```
+kubectl config view
+```
+
+You should see `current-context: remote-context`. If you're on local-context switch to remote.
+
+```
+kubectl config use-context remote-context
+```
+
+We need to delete the Wordpress pods and services from the previous lab.
+
+```
+kubectl delete services wpfrontend mariadb
+kubectl delete pods wordpress mariadb
+```
+
+Ensure they were deleted.
+
+```
+kubectl get services
+kubectl get pods
+```
+
+### Deploy
+
+Now we'll deploy Wordpress as an Atomic app.
 
 1. Change to a temporary directory so we can see the files that are unpacked during the deployment. Run the Atomic app.
 
