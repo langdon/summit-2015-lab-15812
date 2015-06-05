@@ -103,7 +103,7 @@ docker build -t redhat/apache .
 * Next, let's run the image and make sure it started.
 
 ```
-docker run -dt -p 80:80 --name apache redhat/apache
+docker run -dt -p 80:80 --net=host --name apache redhat/apache
 docker ps
 ```
 
@@ -200,7 +200,7 @@ In the next lab we will be pushing our work to this registry. Before we can do s
 1. Edit `/etc/sysconfig/docker`
 1. Find the line in the file that has INSECURE_REGISTRY and make the following change.  We are telling Docker that it is safe to use this registry.
 
-         INSECURE_REGISTRY='--insecure-registry summit-rhel-dev'
+         INSECURE_REGISTRY='--insecure-registry dev.example.com'
 
 1. Save, exit and restart docker daemon
 
