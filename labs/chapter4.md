@@ -15,6 +15,7 @@ So, let's see what will happen. Launch the site:
 ```
 docker run -d -p 3306:3306 -e DBUSER=user -e DBPASS=mypassword -e DBNAME=mydb --name mariadb mariadb
 docker run -d -p 80:80 --link mariadb:db --name wordpress wordpress
+docker ps
 ```
 
 Take a look at the site in your web browswer on your machine using **http://ip:port**
