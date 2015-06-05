@@ -15,17 +15,17 @@ Password: redhat
 Perform the following commands as root unless instructed otherwise.
 
 ```
-# cat /usr/lib/systemd/system/docker.service
-# cat /etc/sysconfig/docker
-# cat /etc/sysconfig/docker-storage
-# cat /etc/sysconfig/docker-network
+ cat /usr/lib/systemd/system/docker.service
+ cat /etc/sysconfig/docker
+ cat /etc/sysconfig/docker-storage
+ cat /etc/sysconfig/docker-network
 ```
 
 * Now start Docker, or make sure that it is started before moving forward.
 
 ```
-# systemctl start docker
-# systemctl status docker
+ systemctl start docker
+ systemctl status docker
 ```
 
 ###Docker Help
@@ -35,28 +35,28 @@ Perform the following commands as root unless instructed otherwise.
 Check out the executables provided:
 
 ```
-# rpm -ql docker | grep bin
+ rpm -ql docker | grep bin
 ```
 
 Check out the configuration files that are provided:
 
 ```
-# rpm -qc docker
+ rpm -qc docker
 ```
 
 Check out the documentation that is provided:
 
 ```
-# rpm -qd docker
-# docker --help
-# docker run --help
-# docker info
+ rpm -qd docker
+ docker --help
+ docker run --help
+ docker info
 ```
 
 * Take a look at the Docker images on the system.  These images have been cached here ahead of time. You should see some RHEL images.
   
 ```
-# docker images
+ docker images
 ```
 
 ###Let's explore a Dockerfile
@@ -66,8 +66,8 @@ Here we are just going to explore a simple Dockerfile.  The purpose for this is 
 * As root, change directory to `~/lab1/` and `cat` out the Dockerfile
 
 ```
-# cd ~/lab1
-# cat Dockerfile
+ cd ~/lab1
+ cat Dockerfile
 FROM registry.access.redhat.com/rhel:7.1-6
 MAINTAINER Student <student@foo.io>
 
@@ -94,7 +94,7 @@ Here you can see in the `FROM` command that we are pulling a RHEL 7.1 base image
 * Now that we have taken a look at the Dockerfile, let's build this image.
 
 ```
-# docker build -t redhat/apache .
+ docker build -t redhat/apache .
 ```
 
 ## Run the Container
@@ -103,8 +103,8 @@ Here you can see in the `FROM` command that we are pulling a RHEL 7.1 base image
 * Next, let's run the image and make sure it started.
 
 ```
-# docker run -dt -p 80:80 --name apache redhat/apache
-# docker ps
+ docker run -dt -p 80:80 --name apache redhat/apache
+ docker ps
 ```
 
 Here we are using a few switches to configure the running container the way we want it.  We are running a `-dt` to run in detached mode with a psuedo TTY.  Next we are mapping a port from the host to the contianer.  We are being explicit here.  We are telling Docker to map port 80 on the host to port 80 in the container.  Now, we could have let Docker handle the host side port mapping dynamically by passing a `-p 80`, in which case Docker would have randomly assigned a port to the container.  You can find that by doing a `docker ps` and see what port got assigned.  Finally we passed in the name of the image that we built earlier.
@@ -113,7 +113,7 @@ Here we are using a few switches to configure the running container the way we w
 * OKay, let's make sure we can access the web server.
 
 ```
-# curl http://localhost
+ curl http://localhost
 Apache
 ```
 
@@ -122,7 +122,7 @@ Apache
 ## Time to Inspect
 
 ```
-# docker inspect apache
+ docker inspect apache
 ```
 
 We can see that this gives us quite a bit of information in json format.  We can scroll around and find the IP address, it will be towards the bottom.  
@@ -130,7 +130,7 @@ We can see that this gives us quite a bit of information in json format.  We can
 * Let's be more explicit with our `docker inspect`
 
 ```
-# docker inspect --format '{{ .NetworkSettings.IPAddress }}' apache
+ docker inspect --format '{{ .NetworkSettings.IPAddress }}' apache
 172.17.0.6
 ```
 
@@ -139,11 +139,11 @@ We can apply the same filter to any value in the json output.  Try a few differe
 * Now lets look inside the container and see what that environment looks like.  We first need to get the PID of the container so we can attach to the PID namespace with nsenter.  After we have the PID, go ahead and enter the namespaces of the container.  Take a look at the man page to understand all the flags we are passing to nsenter.
 
 ```
-# docker inspect --format '{{ .State.Pid }}' apache
+ docker inspect --format '{{ .State.Pid }}' apache
 15492
 
-# man nsenter
-# nsenter -m -u -n -i -p -t 15492
+ man nsenter
+ nsenter -m -u -n -i -p -t 15492
 
 ```
 
@@ -151,18 +151,18 @@ We can apply the same filter to any value in the json output.  Try a few differe
 
 
 ```
-# ps aux
-# ip a
-# ifconfig
-# ls /bin
-# cat /etc/hosts
+ ps aux
+ ip a
+ ifconfig
+ ls /bin
+ cat /etc/hosts
 ```
 
 Well, what can we do?  You can install software into this container.
 
 ```
-# yum -y install iproute
-# ip a
+ yum -y install iproute
+ ip a
 ```
 
 Exit the container namespace with `CTRL+d` or `exit`.
