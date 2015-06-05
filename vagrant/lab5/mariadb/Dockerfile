@@ -4,4 +4,3 @@ MAINTAINER Student <student@foo.io>
 
 ADD /Nulecule /Dockerfile /application-entity/
 ADD /artifacts /application-entity/artifacts
-

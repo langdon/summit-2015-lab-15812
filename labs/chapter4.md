@@ -1,4 +1,4 @@
-## LAB 4: Orchestrated deployment of a decomposed application (Langdon)
+## LAB 4: Orchestrated deployment of a decomposed application 
 
 In this lab we introduce how to orchestrate a multi-container application in Kubernetes.
 
@@ -26,9 +26,10 @@ OLD_CONTAINER_ID=$(docker inspect --format '{{ .Id }}' mariadb)
 docker stop mariadb
 ```
 
-Take a look at the site in your web browswer now. And, imagine, explosions! *making sound effects will be much appreciated by your lab mates.*
+Take a look at the site in your web browswer or using curl now. And, imagine, explosions! *making sound effects will be much appreciated by your lab mates.*
 ```
 web browswer -> **http://ip:port**
+curl -L ip:port
 ```
 
 Now, what is neat about a container system, assuming your web application can handle it, is we can bring it right back up, with no loss of data.
@@ -69,13 +70,13 @@ We specified the version of the Kubernetes api, the name of this pod (aka ```nam
 
 Generally speaking, this is the content you can copy and paste between pods, aside from the names and labels.
 
-Now, let's add the custom information regarding this particular container. To start, we will add the most basic information. Please be sure to replace "YOUR_LAB_DEV_MACHINE" with the name of your machine. Replace the ```containers:```
+Now, let's add the custom information regarding this particular container. To start, we will add the most basic information. 
 
 ```
   containers:
   - capabilities: {}
     env:
-    image: YOUR_LAB_DEV_MACHINE:5000/mariadb
+    image: 192.168.135.2:5000/mariadb
     name: mariadb
     ports:
     - containerPort: 3306
@@ -115,7 +116,7 @@ spec:
       value: mypassword
     - name: DBNAME
       value: mydb
-    image: YOUR_LAB_DEV_MACHINE:5000/mariadb
+    image: 192.168.135.2:5000/mariadb
     name: mariadb
     ports:
     - containerPort: 3306
@@ -124,7 +125,6 @@ spec:
       limits:
         cpu: 100m
 ```
-Be sure to replace "YOUR_LAB_DEV_MACHINE" with the name of your machine if you jumped to this point in the lab.
 
 Our wordpress container is much less complex, so let's do that pod next.
 
@@ -149,14 +149,14 @@ spec:
       value: mypassword
     - name: DB_ENV_DBNAME
       value: mydb
-    image: YOUR_LAB_DEV_MACHINE:5000/wordpress
+    image: 192.168.135.2:5000/wordpress
     name: wordpress
     ports:
     - containerPort: 80
       protocol: TCP
 ```
 
-A couple things to notice about this file. Obviously, we change all the appropriate names to reflect "wordpress" but, largely, it is the same as the mariadb pod file. We also use the environment variables that are specified by the wordpress container, although they need to get the same values as the ones in the mariadb pod. Lastly, just to show you aren't bound to the image or pod names, we also changed the ```labels``` value to "wpfronted". Be sure to replace "YOUR_LAB_DEV_MACHINE" with the name of your machine as with the maria-pod.
+A couple things to notice about this file. Obviously, we change all the appropriate names to reflect "wordpress" but, largely, it is the same as the mariadb pod file. We also use the environment variables that are specified by the wordpress container, although they need to get the same values as the ones in the mariadb pod. Lastly, just to show you aren't bound to the image or pod names, we also changed the ```labels``` value to "wpfronted". 
 
 Ok, so, lets launch our pods and make sure they come up correctly. In order to do this, we need to introduce the ```kubectl``` command which is what drives Kubernetes. Generally, speaking, the format of ```kubectl``` commands is ```kubetctl <operation> <kind>```. Where ```<operation>``` is something like ```create```, ```get```, ```remove```, etc. and ```kind``` is the ```kind``` from the pod files.
 
@@ -214,20 +214,23 @@ vi ~/workspace/wordpress/kubernetes/wordpress-service.yaml
 
 and insert:
 ```
-apiVersion: v1beta3
-kind: Service
-metadata:
-  labels:
-    name: wpfrontend
-  name: wpfrontend
-spec:
-  createExternalLoadBalancer: true
-  ports:
-  - port: 80
-    protocol: TCP
-    targetPort: 80
-  selector:
-    name: wpfrontend
+ kind: Service
+ apiVersion: v1beta3
+ id: wpfrontend
+ metadata:
+   labels:
+     name: wpfrontend
+   name: wpfrontend
+ spec:
+   ports:
+   - port: 80
+     protocol: TCP
+     targetPort: 80
+   selector:
+     name: wpfrontend
+   publicIPs: 
+   - 192.168.135.2
+ containerPort: 80
 ```
 So, here you may notice, there is no reference to wordpress at all. In fact, we might even want to name the file wpfrontend-service.yaml to make it clearer that, in fact, we could have any pod that provides "wordpress capabilities". However, for a lab like this, I thought it would be confusing. 
 
@@ -254,18 +257,26 @@ kubectl get services
 
 Eventually, you should see:
 ```
-POD         IP            CONTAINER(S)   IMAGE(S)                         HOST                  LABELS            STATUS    CREATED
-mariadb     172.17.0.17   mariadb        summit-rhel-dev:5000/mariadb     127.0.0.1/127.0.0.1   name=mariadb      Running   11 hours
-wordpress   172.17.0.18   wordpress      summit-rhel-dev:5000/wordpress   127.0.0.1/127.0.0.1   name=wpfrontend   Running   11 hours
+# kubectl get pods
+POD         IP           CONTAINER(S)   IMAGE(S)                         HOST                  LABELS            STATUS    CREATED
+mariadb     172.17.0.1   mariadb        summit-rhel-dev:5000/mariadb     127.0.0.1/127.0.0.1   name=mariadb      Running   2 hours
+wordpress   172.17.0.2   wordpress      summit-rhel-dev:5000/wordpress   127.0.0.1/127.0.0.1   name=wpfrontend   Running   2 hours
 ```
 
 ```
+# kubectl get services
 NAME            LABELS                                    SELECTOR          IP               PORT(S)
 kubernetes      component=apiserver,provider=kubernetes   <none>            10.254.0.2       443/TCP
 kubernetes-ro   component=apiserver,provider=kubernetes   <none>            10.254.0.1       80/TCP
-mariadb         name=mariadb                              name=mariadb      10.254.252.125   3306/TCP
-wpfrontend      name=wpfrontend                           name=wpfrontend   10.254.127.139   80/TCP
+mariadb         name=mariadb                              name=mariadb      10.254.200.116   3306/TCP
+wpfrontend      name=wpfrontend                           name=wpfrontend   10.254.177.85    80/TCP
+                                                                            192.168.135.2
 ```
+
+Check and make sure you can access the wordpress frontend service that we created.
+
+curl -L http://192.168.135.2
+
 
 Seemed awfully manual and ordered up there, didn't it? Just wait til Lab5 where we make it a lot less painful!
 
@@ -331,9 +342,9 @@ preferences: {}
 users: []
 ```
 
-All right, let's switch to the remote, don't forget to replace YOUR_LAB_DEPLOY_MACHINE with the correct name:
+All right, let's switch to the remote.
 ```
-kubectl config set-cluster remote --server=http://YOUR_LAB_DEPLOY_MACHINE:8080
+kubectl config set-cluster remote --server=http://192.168.135.3:8080
 kubectl config set-context remote-context --cluster=remote
 kubectl config use-context remote-context
 kubectl config view
@@ -343,12 +354,38 @@ You should now have ```current-context: remote-context```. Now, let's prove we a
 kubectl get pods
 kubectl get services
 ```
-Nothing there, right? Ok, so let's start the bits up on the remote, deployment server: 
+Nothing there, right? Ok, so let's start the bits up on the remote, deployment server.  Before we do that, we need to change the publicIP address in the service file so that it uses the IP address on the remote host that we are going to deploy the pod onto.
+
+Open the new service file and put the following definition in it. 
+
+vi ~/workspace/wordpress/kubernetes/wordpress-service-remote.yaml 
+
+```
+kind: Service
+apiVersion: v1beta3
+id: wpfrontend
+metadata:
+  labels:
+    name: wpfrontend
+  name: wpfrontend
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    name: wpfrontend
+  publicIPs:
+  - 192.168.135.3
+containerPort: 80
+```
+
+ 
 ```
 kubectl create -f ~/workspace/mariadb/kubernetes/mariadb-pod.yaml
 kubectl create -f ~/workspace/mariadb/kubernetes/mariadb-service.yaml
 kubectl create -f ~/workspace/wordpress/kubernetes/wordpress-pod.yaml
-kubectl create -f ~/workspace/wordpress/kubernetes/wordpress-service.yaml
+kubectl create -f ~/workspace/wordpress/kubernetes/wordpress-service-remote.yaml
 ```
 
 Now we should see similar results as our local machine from:
@@ -364,21 +401,14 @@ kubectl get endpoints
 Which should give you a result like:
 ```
 NAME            ENDPOINTS
-kubernetes      192.168.121.102:6443
-kubernetes-ro   192.168.121.102:7080
-mariadb         172.17.0.17:3306
-wpfrontend      172.17.0.18:80
+kubernetes      192.168.135.3:6443
+kubernetes-ro   192.168.135.3:7080
+mariadb         172.17.0.1:3306
+wpfrontend      172.17.0.2:80
 ```
 
-In order for this to work, we need to create a tunnel in to the deploy machine to proxy connections to the wordpress server. In order to do that we use the "wpfrontend endpoint" from above and insert it in to the following command which needs to be executed on the deploy machine:
-```
-ssh root@summit_rhel_deploy_target
-ssh -L *:9080:<WPFRONTEND_ENDPOINT>:80 root@localhost
-```
+Now to test it all you need to do is access the IP address and port of the service that is running.  You can either use a browser or curl:
 
-We need to create a tunnel because in the lab environment we have to use subnets on the VMs for Kubernetes to work. Now in your browser type in:
-```
-http://summit-rhel-deploy-target:9080
-```
+curl -L http://192.168.135.3
 
 Ok, now you can move on to lab5, where Aaron will show you how to create an application much more easily.
