@@ -70,7 +70,7 @@ the container. You can run `docker logs` to see the output. To follow or "tail" 
 than the container id for most `docker` commands.
 
 ```
-docker logs bigapp | less
+docker logs -f bigapp 
 ```
 
 If you need to inspect more than just the stderr/stdout of the machine
