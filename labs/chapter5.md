@@ -188,10 +188,10 @@ Now we'll deploy Wordpress as an Atomic app.
 
 1. You will be prompted for each parameter. Where default parameters are provided you may press `enter`. Parameters you will need:
 
-  * wordpress image: `192.168.135.2:5000/wordpress`
-  * mariadb image: `192.168.135.2:5000/mariadb`
+  * wordpress image: `dev.example.com:5000/wordpress`
+  * mariadb image: `dev.example.com:5000/mariadb`
   * database password: your choice. NOTE: you'll be prompted twice, once for db and wordpress pods.
-  * public IP: `192.168.135.3`
+  * public IP: `deploy.example.com`
 
 The mariadb atomic app should be downloaded. The wordpress and database pods and services should be deployed to kubernetes. By default the deployment is in debug mode so expect a lot of terminal output.
 
