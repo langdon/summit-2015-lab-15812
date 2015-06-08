@@ -28,5 +28,3 @@ graph:
       - name: db_name
         description: wordpress database name
         default: db_wordpress
-      - name: publicip
-        description: wordpress frontend public IP address

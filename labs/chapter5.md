@@ -84,8 +84,6 @@ We want to allow some of the values in the kubernetes files to be changed at dep
               - name: db_name
                 description: wordpress database name
                 default: db_wordpress
-              - name: publicip 
-                description: wordpress frontend public IP address
         ...
 
 Save and close the Nulecule file.
@@ -94,7 +92,7 @@ Save and close the Nulecule file.
 
 We need to edit the kubernetes files so the values from the previous step can be replaced.
 
-1. Edit the pod file `~/workspace/artifacts/kubernetes/wordpress-pod.yaml` and replace parameter values to match the name of each parameter in the Nulecule file. Strings that start with `$` will be replaced by parameter names: `$db_user`, `$db_pass`, `$db_name`
+Edit the pod file `~/workspace/artifacts/kubernetes/wordpress-pod.yaml` and replace parameter values to match the name of each parameter in the Nulecule file. Strings that start with `$` will be replaced by parameter names: `$db_user`, `$db_pass`, `$db_name`
 
             ...
             env:
@@ -105,13 +103,6 @@ We need to edit the kubernetes files so the values from the previous step can be
             - name: DB_ENV_DBNAME
               value: $db_name
             ...
-
-1. Edit the Wordpress service file `~/workspace/artifacts/kubernetes/wordpress-service.yaml`. Change the publicIPs value to `$publicip`.
-
-        ...
-           publicIPs: 
-           - $publicip
-        ...
 
 #### Metadata
 
@@ -191,7 +182,6 @@ Now we'll deploy Wordpress as an Atomic app.
   * wordpress image: `dev.example.com:5000/wordpress`
   * mariadb image: `dev.example.com:5000/mariadb`
   * database password: your choice. NOTE: you'll be prompted twice, once for db and wordpress pods.
-  * public IP: `deploy.example.com`
 
 The mariadb atomic app should be downloaded. The wordpress and database pods and services should be deployed to kubernetes. By default the deployment is in debug mode so expect a lot of terminal output.
 
