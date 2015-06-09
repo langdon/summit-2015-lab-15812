@@ -1,6 +1,6 @@
 <domain type='kvm'>
-  <name>summit_rhel_deploy_target</name>
-  <uuid>7350c6a8-9c31-4466-babd-587ce60dccdf</uuid>
+  <name>vagrant_summit_rhel_deploy_target</name>
+  <uuid>ea973585-1dab-44c8-8b55-155e9252fcff</uuid>
   <memory unit='KiB'>524288</memory>
   <currentMemory unit='KiB'>524288</currentMemory>
   <vcpu placement='static'>1</vcpu>
@@ -21,7 +21,7 @@
     <emulator>/usr/bin/qemu-kvm</emulator>
     <disk type='file' device='disk'>
       <driver name='qemu' type='qcow2'/>
-      <source file='/var/lib/libvirt/images/summit_rhel_deploy_target.qcow2'/>
+      <source file='/mnt/vms/vagrant_summit_rhel_deploy_target.img'/>
       <target dev='vda' bus='virtio'/>
       <address type='pci' domain='0x0000' bus='0x00' slot='0x03' function='0x0'/>
     </disk>
@@ -30,10 +30,16 @@
     </controller>
     <controller type='pci' index='0' model='pci-root'/>
     <interface type='network'>
-      <mac address='52:54:00:6f:0f:f2'/>
-      <source network='default'/>
+      <mac address='52:54:00:e8:12:0c'/>
+      <source network='vagrant-libvirt'/>
       <model type='virtio'/>
       <address type='pci' domain='0x0000' bus='0x00' slot='0x05' function='0x0'/>
+    </interface>
+    <interface type='network'>
+      <mac address='52:54:00:b3:3e:1e'/>
+      <source network='containerize'/>
+      <model type='virtio'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x06' function='0x0'/>
     </interface>
     <serial type='pty'>
       <target port='0'/>
