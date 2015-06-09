@@ -6,19 +6,23 @@ Expected completion: 40-60 minutes
 
 Let's start with a little experimentation. I am sure you are all excited about your new blog site! And, now that it is getting super popular with 1000s of views per day, you are starting to worry about uptime.
 
-However, before we get started, let's do a bit of cleanup from the prior labs. Let's delete the old containers (the ```-f``` forces the removal even if the container is running:
-```
-docker rm -f wordpress mariadb
-```  
-
 So, let's see what will happen. Launch the site:
 ```
 docker run -d -p 3306:3306 -e DBUSER=user -e DBPASS=mypassword -e DBNAME=mydb --name mariadb mariadb
 docker run -d -p 80:80 --link mariadb:db --name wordpress wordpress
+```
+
+Take a look at the site in your web browser on your machine using [http://dev.example.com](http://dev.example.com). As you learned before, you can confirm the port that your server is running on by running:
+```
 docker ps
 ```
 
-Take a look at the site in your web browswer on your machine using **http://ip:port**
+and taking look at the "PORTS" column for the wordpress site. You can also get your ip address by looking at the address for the eth0 interface after you execute:
+```
+ip addr
+```
+
+However, we have some nice DNS set up and chose port 80, so you can just use [http://dev.example.com](http://dev.example.com).
 
 Now, let's see what happens when we kick over the database. However, for a later experiment, let's grab the container-id right before you do it. 
 
@@ -27,10 +31,9 @@ OLD_CONTAINER_ID=$(docker inspect --format '{{ .Id }}' mariadb)
 docker stop mariadb
 ```
 
-Take a look at the site in your web browswer or using curl now. And, imagine, explosions! *making sound effects will be much appreciated by your lab mates.*
+Take a look at the site in your web browser or using curl now. And, imagine, explosions! *making sound effects will be much appreciated by your lab mates.*
 ```
-web browswer -> **http://ip:port**
-curl -L ip:port
+web browser -> http://dev.example.com OR curl -L http://dev.example.com
 ```
 
 Now, what is neat about a container system, assuming your web application can handle it, is we can bring it right back up, with no loss of data.
@@ -44,11 +47,28 @@ NEW_CONTAINER_ID=$(docker inspect --format '{{ .Id }}' mariadb)
 echo -e "$OLD_CONTAINER_ID\n$NEW_CONTAINER_ID"
 ```
 
-Hmmm. Well, that is cool, they are exactly the same. OK, so all in all, about what you would expect for a web server and a database running on VMs, but a whole lot faster. However, what if we could automate the recovery? Or, in buzzword terms, "ensure the service remains up"? Enter Kubernetes. And, so you are up on the lingo, sometimes "kube" or "k8s".
+Hmmm. Well, that is cool, they are exactly the same. OK, so all in all, about what you would expect for a web server and a database running on VMs, but a whole lot faster. Let's take a look at the site now.
+```
+web browser -> http://dev.example.com OR curl -L http://dev.example.com
+```
+
+Hmmm. Well, that is disappointing. Unfortunately, because most applications are designed to be deployed on "perfect environments" WordPress doesn't tolerate the destruction of its database without a restart of httpd (there may be plugins or the like to solve this problem, but that is beyond the scope of this lab).
+
+Well, let's go ahead and restart the web server, and we will be right back to where we were. 
+```
+docker stop wordpress
+web browser -> http://dev.example.com OR curl -L http://dev.example.com #should fail, 404
+docker start wordpress
+web browser -> http://dev.example.com OR curl -L http://dev.example.com #site should load
+```
+
+Starting and stopping is definitely easy, and fast. However, it is still pretty manual. What if we could automate the recovery? Or, in buzzword terms, "ensure the service remains up"? Enter Kubernetes. And, so you are up on the lingo, sometimes "kube" or "k8s".
 
 ### Pod Creation
 
-Let's get started by talking about a pod. A pod is a set of containers that provide one "service." The sense here is that the pods need to be co-located on a host and need to be spawned and re-spawned together.
+Let's get started by talking about a pod. A pod is a set of containers that provide one "service." How do you know what to put in a particular pod? Well, pod's containers need to be co-located on a host and need to be spawned and re-spawned together. So, if the containers always need to runner in the same docker instance, well, then they should be a pod.
+
+**Note:** We will be putting this file together in steps to make it easier to explain what the different parts do. We will be identifying the part of the file to modify by looking for an "empty element" that we inserted earlier and then replacing that with a populated element.
 
 Let's make a pod for mariadb. Open a file called mariadb-pod.yaml.
 ```
@@ -67,11 +87,11 @@ spec:
   containers:
 ```
 
-We specified the version of the Kubernetes api, the name of this pod (aka ```name```), the ```kind``` of Kubernetes thing this is, and a ```label``` which lets other Kubernetes things find this one.
+We specified the version of the Kubernetes API, the name of this pod (aka ```name```), the ```kind``` of Kubernetes thing this is, and a ```label``` which lets other Kubernetes things find this one.
 
 Generally speaking, this is the content you can copy and paste between pods, aside from the names and labels.
 
-Now, let's add the custom information regarding this particular container. To start, we will add the most basic information. 
+Now, let's add the custom information regarding this particular container. To start, we will add the most basic information. Please replace the ```containers:``` line with:
 
 ```
   containers:
@@ -86,6 +106,7 @@ Now, let's add the custom information regarding this particular container. To st
       limits:
         cpu: 100m
 ```
+
 Here we set the ```name``` of the container; remember we can have more than one in a pod. We also set the ```image``` to pull, in other words, the container image that should be used and the registry to get it from. We can also set limitations here like cpu cap and exposed ports.
 
 Lastly, we need to configure the environment variables that need to be fed from the host environment to the container. Replace ```env:``` with:
@@ -117,7 +138,7 @@ spec:
       value: mypassword
     - name: DBNAME
       value: mydb
-    image: 192.168.135.2:5000/mariadb
+    image: dev.example.com:5000/mariadb
     name: mariadb
     ports:
     - containerPort: 3306
@@ -144,13 +165,7 @@ metadata:
 spec:
   containers:
   - env:
-    - name: DB_ENV_DBUSER
-      value: user
-    - name: DB_ENV_DBPASS
-      value: mypassword
-    - name: DB_ENV_DBNAME
-      value: mydb
-    image: 192.168.135.2:5000/wordpress
+    image: dev.example.com:5000/wordpress
     name: wordpress
     ports:
     - containerPort: 80
@@ -233,6 +248,7 @@ and insert:
    - 192.168.135.2
  containerPort: 80
 ```
+
 So, here you may notice, there is no reference to wordpress at all. In fact, we might even want to name the file wpfrontend-service.yaml to make it clearer that, in fact, we could have any pod that provides "wordpress capabilities". However, for a lab like this, I thought it would be confusing. 
 
 An even better example might have been if we had made the mariadb-service just a "db" service and then, the pod could be mariadb, mysql, sqlite, anything really, that can support SQL the way wordpress expects it to. In order to do that, we would just have to add a ```label``` to the ```mariadb-pod.yaml``` called "db" and a ```selector``` in the ```mariadb-service.yaml``` (although, an even better name might be ```db-service.yaml```) called ```db```. Feel free to experiment with that at the end of this lab if you have time.
@@ -254,6 +270,7 @@ OK, now let's make sure everything came up correctly:
 kubectl get pods
 kubectl get services
 ```
+
 **Note** these may take a while to get to a ```RUNNING``` state as it pulls the image from the registry, spin up the containers, do the kubernetes magic, etc. 
 
 Eventually, you should see:
@@ -276,10 +293,12 @@ wpfrontend      name=wpfrontend                           name=wpfrontend   10.2
 
 Check and make sure you can access the wordpress frontend service that we created.
 
-curl -L http://192.168.135.2
+curl -L http://dev.example.com
 
 
 Seemed awfully manual and ordered up there, didn't it? Just wait til Lab5 where we make it a lot less painful!
+
+### Remote Deployment
 
 Now that we are satisfied that our containers and Kubernetes definitions work, let's try deploying it to a remote server.
 
