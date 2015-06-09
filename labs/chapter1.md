@@ -2,7 +2,7 @@
 
 In this lab we will explore the docker environment. If you are familiar with docker this may function as a brief refresher. If you are new to docker this will serve as an introduction to docker basics.  Don't worry, we will progress rapidly.  To get through this lab, we are going to focus on the environment itself as well as walk through some exercises with a couple of Docker images / containers to tell a complete story and point out some things that you might have to consider when containerizing your application.
 
-This lab should be performed on dev.deskX.example.com unless otherwise instructed.  
+This lab should be performed on summit-rhel-dev unless otherwise instructed.  
 
 Username: root
 Password: redhat
@@ -132,12 +132,13 @@ We can see that this gives us quite a bit of information in json format.  We can
 
 ```
 docker inspect --format '{{ .NetworkSettings.IPAddress }}' apache
-172.17.0.6
 ```
+
+Why don't we get an IP address?  The reason is, because we used the --net=host option.  The container is sharing an interface with the host.
 
 We can apply the same filter to any value in the json output.  Try a few different ones.
 
-* Now lets look inside the container and see what that environment looks like.  We first need to get the PID of the container so we can attach to the PID namespace with nsenter.  After we have the PID, go ahead and enter the namespaces of the container.  Take a look at the man page to understand all the flags we are passing to nsenter.
+* Now lets look inside the container and see what that environment looks like.  We first need to get the PID of the container so we can attach to the PID namespace with nsenter.  After we have the PID, go ahead and enter the namespaces of the container substituting the PID on your container for the one listed below.  Take a look at the man page to understand all the flags we are passing to nsenter.
 
 ```
 docker inspect --format '{{ .State.Pid }}' apache
@@ -201,7 +202,7 @@ In the next lab we will be pushing our work to this registry. Before we can do s
 1. Edit `/etc/sysconfig/docker`
 1. Find the line in the file that has INSECURE_REGISTRY and make the following change.  We are telling Docker that it is safe to use this registry.
 
-         INSECURE_REGISTRY='--insecure-registry dev.example.com'
+         INSECURE_REGISTRY='--insecure-registry summit-rhel-dev'
 
 1. Save, exit and restart docker daemon
 
