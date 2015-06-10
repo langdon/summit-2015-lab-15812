@@ -226,11 +226,13 @@ When we have a working `docker run` recipe we want a way to communicate that to 
 
         docker build -t wordpress wordpress/
 
-1. Re-run the Wordpress image using the `atomic` CLI. We don't need to use complicated, error-prone `docker run` string. Test using the methods from the earlier step.
+1. Re-run the Wordpress image using the `atomic` CLI. We don't need to use complicated, error-prone `docker run` string. Test using the methods from the earlier step. Also, take a look at the LABEL metadata in the image with `atomic info`.
 
         docker stop wordpress
         docker rm wordpress
         atomic run wordpress
+        atomic info wordpress
+        docker ps
         curl -L http://localhost
 
 1. Once satisfied with the images tag them with the URI of the local lab local registry
@@ -239,7 +241,7 @@ When we have a working `docker run` recipe we want a way to communicate that to 
         docker tag wordpress summit-rhel-dev:5000/wordpress
         docker images
 
-1. Push the images
+1. Push the images.  This will allow us to use these images from the Atomic host in the lab.
 
         docker push summit-rhel-dev:5000/mariadb
         docker push summit-rhel-dev:5000/wordpress
