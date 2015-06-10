@@ -7,6 +7,18 @@ This lab should be performed on summit-rhel-dev unless otherwise instructed.
 Username: root
 Password: redhat
 
+Expected completion: 15-20 minutes
+
+Agenda:
+
+* Review Docker and systemd
+* Review Docker help
+* Explore a Dockerfile
+* Build an image
+* Launch a container
+* Inspect a container
+* Build Docker registry
+
 
 ###Docker and systemd
 
