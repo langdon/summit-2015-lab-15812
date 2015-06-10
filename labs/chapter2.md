@@ -73,6 +73,9 @@ than the container id for most `docker` commands.
 docker logs -f bigapp 
 ```
 
+**__NOTE:__** When you are finished inspecting the log, just CTRL-C out.
+
+
 If you need to inspect more than just the stderr/stdout of the machine
 then you can enter into the namespace of the container to insepct
 things more closely. The easiest way to do this is to use `docker exec`. Try it out:
