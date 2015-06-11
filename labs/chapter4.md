@@ -15,6 +15,7 @@ docker run -d -p 80:80 --link mariadb:db --name wordpress wordpress
 Take a look at the site in your web browser on your machine using [http://dev.example.com](http://dev.example.com). As you learned before, you can confirm the port that your server is running on by running:
 ```
 docker ps
+docker port wordpress
 ```
 
 and taking look at the "PORTS" column for the wordpress site. You can also get your ip address by looking at the address for the eth0 interface after you execute:
@@ -165,6 +166,12 @@ metadata:
 spec:
   containers:
   - env:
+    - name: DB_ENV_DBUSER
+      value: user
+    - name: DB_ENV_DBPASS
+      value: mypassword
+    - name: DB_ENV_DBNAME
+      value: mydb
     image: dev.example.com:5000/wordpress
     name: wordpress
     ports:
@@ -188,6 +195,12 @@ kubectl get pods
 ```
 
 Which should output two pods, one called ```mariadb``` and one called ```wordpress```.
+
+If you have any issues with the pods transistioning from a "Pending" state, you can check out the logs for each service.
+
+```
+journalctl -fl -u kube-apiserver -u kube-controller-manager -u kube-proxy -u kube-scheduler -u kubelet -u etcd -u docker
+```
 
 Ok, now let's kill them off so we can introduce the services that will let them more dynamically find each other.
 ```
