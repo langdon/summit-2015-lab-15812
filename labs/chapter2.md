@@ -109,7 +109,7 @@ docker port bigapp
 
 Now connect to the port via the web browser on your machine using **http://ip:port**.  You can also use curl to connect, for example:
 
-curl -L http://192.168.121.97:32769
+curl -L http://dev.example.com:32769
 
 
 ### Review Dockerfile practices

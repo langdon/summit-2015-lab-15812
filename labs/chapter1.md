@@ -2,7 +2,7 @@
 
 In this lab we will explore the docker environment. If you are familiar with docker this may function as a brief refresher. If you are new to docker this will serve as an introduction to docker basics.  Don't worry, we will progress rapidly.  To get through this lab, we are going to focus on the environment itself as well as walk through some exercises with a couple of Docker images / containers to tell a complete story and point out some things that you might have to consider when containerizing your application.
 
-This lab should be performed on summit-rhel-dev unless otherwise instructed.  
+This lab should be performed on dev.example.com unless otherwise instructed.  
 
 Username: root
 Password: redhat

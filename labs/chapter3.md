@@ -235,14 +235,14 @@ When we have a working `docker run` recipe we want a way to communicate that to 
 
 1. Once satisfied with the images tag them with the URI of the local lab local registry
 
-        docker tag mariadb summit-rhel-dev:5000/mariadb
-        docker tag wordpress summit-rhel-dev:5000/wordpress
+        docker tag mariadb dev.example.com:5000/mariadb
+        docker tag wordpress dev.example.com:5000/wordpress
         docker images
 
 1. Push the images
 
-        docker push summit-rhel-dev:5000/mariadb
-        docker push summit-rhel-dev:5000/wordpress
+        docker push dev.example.com:5000/mariadb
+        docker push dev.example.com:5000/wordpress
 
 ### Clean Up
 
