@@ -1,4 +1,4 @@
-## LAB 5: Packaging an Atomic App
+## LAB 5: Packaging an Atomic App -- Bonus/Preview
 
 In this lab we walk through packaging an application into a single deployment unit. This is called an Atomic App and is based on the [Nulecule specification](https://github.com/projectatomic/nulecule/).
 
@@ -43,9 +43,9 @@ Take a look at the Nulecule file. There are two primary sections: metadata and g
 
         ...
         graph:
-          - name: mariadb
+          - name: mariadb   #CHANGEME
             source: "docker://registry.example.com/some/database"
-          - name: wordpress
+          - name: wordpress #CHANGEME
         ...
 
 1. To reference another Atomic app use the `source` key to point to another container image. In the database component reference the database atomic app that was pre-built for this lab.
@@ -53,7 +53,7 @@ Take a look at the Nulecule file. There are two primary sections: metadata and g
         ...
         graph:
           - name: mariadb
-            source: "docker://mariadb-atomicapp"
+            source: "docker://mariadb-atomicapp" #CHANGEME
         ...
 
 1. Save and close the Nulecule file. Copy the Wordpress kubernetes directory created in lab 4 into the `artifacts` directory. Since these are for the kubernetes provider we'll put them in a `kubernetes` sub-directory.
@@ -64,8 +64,8 @@ Take a look at the Nulecule file. There are two primary sections: metadata and g
 
             artifacts:
               kubernetes:
-                - file://artifacts/kubernetes/wordpress-pod.yaml
-                - file://artifacts/kubernetes/wordpress-service.yaml
+                - file://artifacts/kubernetes/wordpress-pod.yaml     #CHANGEME
+                - file://artifacts/kubernetes/wordpress-service.yaml #CHANGEME
 
 #### Parameters
 
@@ -73,7 +73,7 @@ We want to allow some of the values in the kubernetes files to be changed at dep
 
         ...
           - name: wordpress
-            params:
+            params: #UPDATE ENTIRE SECTION BELOW
               - name: image
                 description: wordpress docker image
               - name: db_user 
@@ -95,13 +95,14 @@ We need to edit the kubernetes files so the values from the previous step can be
 Edit the pod file `~/workspace/artifacts/kubernetes/wordpress-pod.yaml` and replace parameter values to match the name of each parameter in the Nulecule file. Strings that start with `$` will be replaced by parameter names: `$db_user`, `$db_pass`, `$db_name`
 
             ...
-            env:
+            env: #UPDATE ENTIRE SECTION BELOW
             - name: DB_ENV_DBUSER
               value: $db_user
             - name: DB_ENV_DBPASS
               value: $db_pass
             - name: DB_ENV_DBNAME
               value: $db_name
+            image: $image
             ...
 
 #### Metadata
@@ -110,11 +111,11 @@ The Nulecule specification provides a section for arbitrary metadata. For this l
 
 Open the Nulecule file in an editor. Edit the metadata section of the Nulecule file, changing the name and description fields.
 
-        --- 
+        ---
         specversion: "0.0.2"
 
         id: summit-2015-wp
-        metadata: 
+        metadata:
           name: Wordpress
           appversion: v1.0.0
           description: >
@@ -128,18 +129,12 @@ Save and close the file.
 That completes the Nulecule file work. You can check your work against the reference file for this lab in `~/workspace/Nulecule.reference`.
 
 ```
-diff ~/workspace/Nulecule ~/workspace/Nulecule.reference
+diff ~/workspace/Nulecule ~/workspace/reference_files/Nulecule
+diff ~/workspace/artifacts/kubernetes/wordpress-pod.yaml ~/workspace/reference_files/artifacts/kubernetes/wordpress-pod.yaml
+diff ~/workspace/artifacts/kubernetes/wordpress-service.yaml ~/workspace/reference_files/artifacts/kubernetes/wordpress-service.yaml
 ```
 
-### Build
-
-We will be packaging the atomic app as a container. This way there is no "out of band" metadata mangement channel: everything is a container.
-
-Build the Atomic app. We will use the standard Dockerfile for atomic app.
-
-```
-docker build -t wordpress-rhel7-atomicapp ~/workspace/.
-```
+### Test
 
 Before we test our work let's make sure our Kubernetes environment is setup correctly from the previous lab.
 
@@ -171,11 +166,17 @@ kubectl get pods
 
 Now we'll deploy Wordpress as an Atomic app.
 
-1. Change to a temporary directory so we can see the files that are unpacked during the deployment. Run the Atomic app.
+1. We will run the atomic app base container image where the `Nulecule` file is in `~/workspace`.
 
-        cd /tmp
-        ls
-        atomic run wordpress-rhel7-atomicapp
+        cd ~/workspace
+
+1. Inspect the Atomic app base container image. Notice how `LABEL RUN` mounts in the current working directory with the `-v 'pwd':...` option.
+
+        atomic info projectatomic/atomicapp:0.1.1
+
+1. Run the Atomic app.
+
+        atomic run projectatomic/atomicapp:0.1.1
 
 1. You will be prompted for each parameter. Where default parameters are provided you may press `enter`. Parameters you will need:
 
@@ -183,7 +184,7 @@ Now we'll deploy Wordpress as an Atomic app.
   * mariadb image: `dev.example.com:5000/mariadb`
   * database password: your choice. NOTE: you'll be prompted twice, once for db and wordpress pods.
 
-The mariadb atomic app should be downloaded. The wordpress and database pods and services should be deployed to kubernetes. By default the deployment is in debug mode so expect a lot of terminal output.
+The mariadb atomic app should be downloaded. Since it is a remote source the MariaDB atomic app files are placed in directory `external`. The wordpress and database pods and services should be deployed to kubernetes. By default the deployment is in debug mode so expect a lot of terminal output.
 
 Check the deployment progress in the same way we did in lab 4.
 
@@ -193,13 +194,6 @@ kubectl get services
 kubectl get endpoints
 ```
 
-The wordpress files were downloaded to the local directory. The mariadb files are placed in an `external` directory.
-
-```
-ls -l /tmp
-ls -l /tmp/external
-```
-
 View the sample answerfile.
 
 ```
@@ -207,3 +201,17 @@ cat answers.conf.sample
 ```
 
 This may be renamed `answers.conf` and used for future unattended deployments.
+
+When working with structured data files any YAML syntax error will cause a parsing failure. Use the diff commands above, check your files and run again.
+
+### Build
+
+We will be packaging the atomic app as a self-executing metadata container. This way there is no "out of band" metadata mangement channel: everything is a container.
+
+Build the Atomic app. We will use the standard Dockerfile from the template unaltered.
+
+```
+docker build -t wordpress-rhel7-atomicapp ~/workspace/.
+```
+
+At this point the `wordpress-rhel7-atomicapp` container image may be distributed across a datacenter or around the world as a single deployment unit.
