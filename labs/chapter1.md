@@ -214,7 +214,7 @@ In the next lab we will be pushing our work to this registry. Before we can do s
 1. Edit `/etc/sysconfig/docker`
 1. Find the line in the file that has INSECURE_REGISTRY and make the following change.  We are telling Docker that it is safe to use this registry.
 
-         INSECURE_REGISTRY='--insecure-registry dev.example.com'
+         INSECURE_REGISTRY='--insecure-registry dev.example.com:5000'
 
 1. Save, exit and restart docker daemon
 
