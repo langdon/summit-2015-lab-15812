@@ -67,7 +67,7 @@ Starting and stopping is definitely easy, and fast. However, it is still pretty 
 
 ### Pod Creation
 
-Let's get started by talking about a pod. A pod is a set of containers that provide one "service." How do you know what to put in a particular pod? Well, pod's containers need to be co-located on a host and need to be spawned and re-spawned together. So, if the containers always need to runner in the same docker instance, well, then they should be a pod.
+Let's get started by talking about a pod. A pod is a set of containers that provide one "service." How do you know what to put in a particular pod? Well, pod's containers need to be co-located on a host and need to be spawned and re-spawned together. So, if the containers always need to running on the same docker host, well, then they should be a pod.
 
 **Note:** We will be putting this file together in steps to make it easier to explain what the different parts do. We will be identifying the part of the file to modify by looking for an "empty element" that we inserted earlier and then replacing that with a populated element.
 
@@ -98,7 +98,7 @@ Now, let's add the custom information regarding this particular container. To st
   containers:
   - capabilities: {}
     env:
-    image: 192.168.135.2:5000/mariadb
+    image: dev.example.com:5000/mariadb
     name: mariadb
     ports:
     - containerPort: 3306
