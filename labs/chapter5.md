@@ -71,20 +71,22 @@ Take a look at the Nulecule file. There are two primary sections: metadata and g
 
 We want to allow some of the values in the kubernetes files to be changed at deployment time. Edit the Nulecule file to add the following parameters. Items without a default value will require input during deployment time. Replace the contents of the `params:` section with the list of parameters.
 
-        ...
-          - name: wordpress
-            params: #UPDATE ENTIRE SECTION BELOW
-              - name: image
-                description: wordpress docker image
-              - name: db_user 
-                description: wordpress database username
-                default: wp_user
-              - name: db_pass
-                description: wordpress database password
-              - name: db_name
-                description: wordpress database name
-                default: db_wordpress
-        ...
+    ...
+      - name: wordpress
+        params: #UPDATE ENTIRE SECTION BELOW
+          - name: image
+            description: wordpress docker image
+          - name: publicip
+            description: wordpress frontend IP address
+          - name: db_user 
+            description: wordpress database username
+            default: wp_user
+          - name: db_pass
+            description: wordpress database password
+          - name: db_name
+            description: wordpress database name
+            default: db_wordpress
+    ...
 
 Save and close the Nulecule file.
 
@@ -94,16 +96,25 @@ We need to edit the kubernetes files so the values from the previous step can be
 
 Edit the pod file `~/workspace/artifacts/kubernetes/wordpress-pod.yaml` and replace parameter values to match the name of each parameter in the Nulecule file. Strings that start with `$` will be replaced by parameter names: `$db_user`, `$db_pass`, `$db_name`
 
-            ...
-            env: #UPDATE ENTIRE SECTION BELOW
-            - name: DB_ENV_DBUSER
-              value: $db_user
-            - name: DB_ENV_DBPASS
-              value: $db_pass
-            - name: DB_ENV_DBNAME
-              value: $db_name
-            image: $image
-            ...
+        ...
+        env: #UPDATE ENTIRE SECTION BELOW
+        - name: DB_ENV_DBUSER
+          value: $db_user
+        - name: DB_ENV_DBPASS
+          value: $db_pass
+        - name: DB_ENV_DBNAME
+          value: $db_name
+        image: $image
+        ...
+
+Edit the service file `~/workspace/artifacts/kubernetes/wordpress-service.yaml` and replace the public IP parameter value.
+
+```
+...
+   publicIPs: 
+   - $publicip
+ containerPort: 80
+```
 
 #### Metadata
 
@@ -111,18 +122,20 @@ The Nulecule specification provides a section for arbitrary metadata. For this l
 
 Open the Nulecule file in an editor. Edit the metadata section of the Nulecule file, changing the name and description fields.
 
-        ---
-        specversion: "0.0.2"
+```
+---
+specversion: "0.0.2"
 
-        id: summit-2015-wp
-        metadata:
-          name: Wordpress
-          appversion: v1.0.0
-          description: >
-            WordPress is web software you can use to create a beautiful
-            website or blog. We like to say that WordPress is both free
-            and priceless at the same time.
+id: summit-2015-wp
+metadata:
+  name: Wordpress
+  appversion: v1.0.0
+  description: >
+    WordPress is web software you can use to create a beautiful
+    website or blog. We like to say that WordPress is both free
+    and priceless at the same time.
 ...
+```
 
 Save and close the file.
 
@@ -170,7 +183,7 @@ Now we'll deploy Wordpress as an Atomic app.
 
         cd ~/workspace
 
-1. Inspect the Atomic app base container image. Notice how `LABEL RUN` mounts in the current working directory with the `-v 'pwd':...` option.
+1. Inspect the Atomic app base container image. Notice how the `RUN` LABEL mounts in the current working directory with the `-v 'pwd':/atomicapp` option.
 
         atomic info projectatomic/atomicapp:0.1.1
 
@@ -183,6 +196,7 @@ Now we'll deploy Wordpress as an Atomic app.
   * wordpress image: `dev.example.com:5000/wordpress`
   * mariadb image: `dev.example.com:5000/mariadb`
   * database password: your choice. NOTE: you'll be prompted twice, once for db and wordpress pods.
+  * publicip: `192.168.135.3`
 
 The mariadb atomic app should be downloaded. Since it is a remote source the MariaDB atomic app files are placed in directory `external`. The wordpress and database pods and services should be deployed to kubernetes. By default the deployment is in debug mode so expect a lot of terminal output.
 
