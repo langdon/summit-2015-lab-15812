@@ -72,7 +72,6 @@ Take a look at the Nulecule file. There are two primary sections: metadata and g
 We want to allow some of the values in the kubernetes files to be changed at deployment time. Edit the Nulecule file to add the following parameters. Items without a default value will require input during deployment time. Replace the contents of the `params:` section with the list of parameters.
 
     ...
-      - name: wordpress
         params: #UPDATE ENTIRE SECTION BELOW
           - name: image
             description: wordpress docker image
@@ -94,7 +93,7 @@ Save and close the Nulecule file.
 
 We need to edit the kubernetes files so the values from the previous step can be replaced.
 
-Edit the pod file `~/workspace/artifacts/kubernetes/wordpress-pod.yaml` and replace parameter values to match the name of each parameter in the Nulecule file. Strings that start with `$` will be replaced by parameter names: `$db_user`, `$db_pass`, `$db_name`
+Edit the pod file `~/workspace/artifacts/kubernetes/wordpress-pod.yaml` and replace parameter values to match the name of each parameter in the Nulecule file. Strings that start with `$` will be replaced by parameter names: `$db_user`, `$db_pass`, `$db_name`, `$image`.
 
         ...
         env: #UPDATE ENTIRE SECTION BELOW
@@ -120,7 +119,7 @@ Edit the service file `~/workspace/artifacts/kubernetes/wordpress-service.yaml` 
 
 The Nulecule specification provides a section for arbitrary metadata. For this lab we will simply change a few values for demonstration purposes.
 
-Open the Nulecule file in an editor. Edit the metadata section of the Nulecule file, changing the name and description fields.
+Open the Nulecule file in an editor. Edit the metadata section of the Nulecule file, changing the `name` and `description` fields.
 
 ```
 ---

@@ -20,6 +20,8 @@ graph:
     params:
       - name: image
         description: wordpress docker image
+      - name: publicip
+        description: wordpress frontend IP address
       - name: db_user
         description: wordpress database username
         default: wp_user
