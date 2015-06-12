@@ -148,19 +148,16 @@ diff ~/workspace/artifacts/kubernetes/wordpress-service.yaml ~/workspace/referen
 
 ### Test
 
-Before we test our work let's make sure our Kubernetes environment is setup correctly from the previous lab.
+Before we test our work let's switch back to local context.
 
 ```
+kubectl config use-context local-context
 kubectl config view
 ```
 
-You should see `current-context: remote-context`. If you're on local-context switch to remote.
+You should see `current-context: local-context`.
 
-```
-kubectl config use-context remote-context
-```
-
-We need to delete the Wordpress pods and services from the previous lab.
+Ensure we do not have any pods or services running from the previous lab.
 
 ```
 kubectl delete services wpfrontend mariadb
@@ -173,8 +170,6 @@ Ensure they were deleted.
 kubectl get services
 kubectl get pods
 ```
-
-### Deploy
 
 Now we'll deploy Wordpress as an Atomic app.
 
