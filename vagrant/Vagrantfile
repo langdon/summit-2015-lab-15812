@@ -11,23 +11,11 @@ Vagrant.configure(2) do |config|
     summit_rhel_deploy_target.vm.synced_folder ".", "/home/vagrant/sync", disabled: true
 
     #vagrant sync is not a fan of wildcards
-    summit_rhel_deploy_target.vm.synced_folder "./workspace", "/root/workspace/", type: "rsync",
+    summit_rhel_deploy_target.vm.synced_folder "./sync/workspace", "/root/workspace/", type: "rsync",
                                     rsync__exclude: [ ".git/", ".#*", "*~" ]
-    summit_rhel_deploy_target.vm.synced_folder "./lab1", "/root/lab1", type: "rsync",
+    summit_rhel_deploy_target.vm.synced_folder "./sync/labs/*", "/root/", type: "rsync",
                                     rsync__exclude: [ ".git/", ".#*", "*~" ]
-    summit_rhel_deploy_target.vm.synced_folder "./lab2", "/root/lab2", type: "rsync",
-                                    rsync__exclude: [ ".git/", ".#*", "*~" ]
-    summit_rhel_deploy_target.vm.synced_folder "./lab3", "/root/lab3", type: "rsync",
-                                    rsync__exclude: [ ".git/", ".#*", "*~" ]
-    summit_rhel_deploy_target.vm.synced_folder "./lab4", "/root/lab4", type: "rsync",
-                                    rsync__exclude: [ ".git/", ".#*", "*~" ]
-    summit_rhel_deploy_target.vm.synced_folder "./lab5", "/root/lab5", type: "rsync",
-                                    rsync__exclude: [ ".git/", ".#*", "*~" ]
-    summit_rhel_deploy_target.vm.synced_folder "./support_files", "/root/support_files", type: "rsync",
-                                    rsync__exclude: [ ".git/", ".#*", "*~" ]
-    summit_rhel_deploy_target.vm.synced_folder "./answers", "/root/answers", type: "rsync",
-                                    rsync__exclude: [ ".git/", ".#*", "*~" ]
-
+ 
     # subscription manager stuff (only if vagrant-registration plugin is installed)
     if Vagrant.has_plugin?('vagrant-registration')
       if ENV['SUB_USERNAME'] then summit_rhel_deploy_target.registration.username = ENV['SUB_USERNAME'] end
@@ -82,23 +70,9 @@ Vagrant.configure(2) do |config|
     summit_rhel_dev.vm.synced_folder ".", "/home/vagrant/sync", disabled: true
 
     #vagrant sync is not a fan of wildcards
-    summit_rhel_dev.vm.synced_folder "./workspace", "/root/workspace/", type: "rsync",
+    summit_rhel_dev.vm.synced_folder "./sync/workspace", "/root/workspace/", type: "rsync",
                                     rsync__exclude: [ ".git/", ".#*", "*~" ]
-    summit_rhel_dev.vm.synced_folder "./lab1", "/root/lab1", type: "rsync",
-                                    rsync__exclude: [ ".git/", ".#*", "*~" ]
-    summit_rhel_dev.vm.synced_folder "./lab2", "/root/lab2", type: "rsync",
-                                    rsync__exclude: [ ".git/", ".#*", "*~" ]
-    summit_rhel_dev.vm.synced_folder "./lab3", "/root/lab3", type: "rsync",
-                                    rsync__exclude: [ ".git/", ".#*", "*~" ]
-    summit_rhel_dev.vm.synced_folder "./lab4", "/root/lab4", type: "rsync",
-                                    rsync__exclude: [ ".git/", ".#*", "*~" ]
-    summit_rhel_dev.vm.synced_folder "./lab5", "/root/lab5", type: "rsync",
-                                    rsync__exclude: [ ".git/", ".#*", "*~" ]
-    summit_rhel_dev.vm.synced_folder "./support_files", "/root/support_files", type: "rsync",
-                                    rsync__exclude: [ ".git/", ".#*", "*~" ]
-    summit_rhel_dev.vm.synced_folder "./answers", "/root/answers", type: "rsync",
-                                    rsync__exclude: [ ".git/", ".#*", "*~" ]
-    summit_rhel_dev.vm.synced_folder "../labs", "/root/markdown_lab_docs/", type: "rsync",
+    summit_rhel_dev.vm.synced_folder "./sync/labs/*", "/root/", type: "rsync",
                                     rsync__exclude: [ ".git/", ".#*", "*~" ]
 
     #set root password
