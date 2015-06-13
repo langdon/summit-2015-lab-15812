@@ -89,6 +89,7 @@ ls -lR wordpress
 
 1. Add local files for this lab environment. This is only required for this lab.
 
+        ADD ./local.repo /etc/yum.repos.d/local.repo
 
 1. Add the required packages. We'll include `yum clean all` at the end to clear the yum cache.
 
@@ -130,6 +131,7 @@ Now we'll create the Wordpress Dockerfile.
 
 1. Add local files for this lab environment. This is only required for this lab.
 
+        ADD ./local.repo /etc/yum.repos.d/local.repo
 
 1. Add the required packages. We'll include `yum clean all` at the end to clear the yum cache.
 

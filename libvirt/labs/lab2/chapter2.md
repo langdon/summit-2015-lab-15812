@@ -136,6 +136,7 @@ ADD  scripts /scripts
 RUN chmod 755 /scripts/*
 
 # Add in custom yum repository and update
+ADD ./local.repo /etc/yum.repos.d/local.repo
 RUN yum -y update
 
 >>> Running a yum clean all in the same statement would clear the yum

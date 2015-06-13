@@ -83,6 +83,7 @@ cat Dockerfile
 FROM registry.access.redhat.com/rhel:7.1-6
 MAINTAINER Student <student@foo.io>
 
+ADD ./local.repo /etc/yum.repos.d/local.repo
 RUN yum -y update && yum clean all
 RUN yum -y install httpd && yum clean all
 RUN echo "Apache" >> /var/www/html/index.html
