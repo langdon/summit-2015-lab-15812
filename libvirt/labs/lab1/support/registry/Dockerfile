@@ -1,7 +1,6 @@
 FROM registry.access.redhat.com/rhel:7.1-6
 MAINTAINER Student <student@foo.io>
 
-ADD ./local.repo /etc/yum.repos.d/local.repo
 ADD ./run-registry.sh /opt/registry/run-registry.sh
 
 RUN yum -y install docker-registry && yum clean all

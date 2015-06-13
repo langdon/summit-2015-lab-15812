@@ -6,7 +6,6 @@ ADD  scripts /scripts
 RUN chmod 755 /scripts/*
 
 # Add in custom yum repository and update
-ADD ./local.repo /etc/yum.repos.d/local.repo
 RUN yum -y update
 
 # Common Deps
