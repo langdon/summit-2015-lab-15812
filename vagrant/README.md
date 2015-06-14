@@ -2,6 +2,8 @@
 Environment
 ===========
 
+### NOTE: this might be a little borked currently, concentrating on the libvirt version right now
+
 To set up the entire environment from F21 install packages (along with deps):
 
 ```
