@@ -2,9 +2,11 @@
 
 In this lab you will deconstruct an application into microservices, creating a multi-container application. In this process we explore the challenges of networking, storage and configuration.
 
-Expected completion: 20-30 minutes
+This lab should be performed on dev.example.com unless otherwise instructed.
 
-TODO: present an architectual graphic (deconstructed, microservices)
+Username: root; Password: redhat
+
+Expected completion: 20-30 minutes
 
 ### Decompose the application
 
@@ -93,8 +95,7 @@ ls -lR wordpress
 
 1. Add the required packages. We'll include `yum clean all` at the end to clear the yum cache.
 
-        RUN \
-            yum -y install mariadb-server openssl psmisc net-tools hostname && \
+        RUN yum -y install mariadb-server openssl psmisc net-tools hostname && \
             yum clean all
 
 1. Add the dependent scripts and make them executable.
@@ -135,8 +136,7 @@ Now we'll create the Wordpress Dockerfile.
 
 1. Add the required packages. We'll include `yum clean all` at the end to clear the yum cache.
 
-        RUN \
-            yum -y install httpd php php-mysql php-gd openssl psmisc tar && \
+        RUN yum -y install httpd php php-mysql php-gd openssl psmisc tar && \
             yum clean all
 
 1. Add the dependent scripts and make them executable.
@@ -231,7 +231,7 @@ When we have a working `docker run` recipe we want a way to communicate that to 
         atomic run wordpress
         curl -L http://localhost
 
-1. Once satisfied with the images tag them with the URI of the local lab local registry
+1. Once satisfied with the images tag them with the URI of the local lab local registry. The tag is what Docker uses to identify the particular image that we want to upload to a registry.
 
         docker tag mariadb dev.example.com:5000/mariadb
         docker tag wordpress dev.example.com:5000/wordpress

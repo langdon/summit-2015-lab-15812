@@ -7,12 +7,6 @@ metadata:
 spec:
   containers:
   - env:
-    - name: DB_ENV_DBUSER
-      value: user
-    - name: DB_ENV_DBPASS
-      value: mypassword
-    - name: DB_ENV_DBNAME
-      value: mydb
     image: summit-rhel-dev:5000/wordpress
     name: wordpress
     ports:

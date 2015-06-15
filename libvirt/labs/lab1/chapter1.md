@@ -4,8 +4,7 @@ In this lab we will explore the docker environment. If you are familiar with doc
 
 This lab should be performed on dev.example.com unless otherwise instructed.  
 
-Username: root
-Password: redhat
+Username: root; Password: redhat
 
 Expected completion: 15-20 minutes
 
@@ -153,10 +152,10 @@ We can apply the same filter to any value in the json output.  Try a few differe
 
 ```
 docker inspect --format '{{ .State.Pid }}' apache
-15492
+<PID> (e.g. 15492)
 
 man nsenter
-nsenter -m -u -n -i -p -t 15492
+nsenter -m -u -n -i -p -t <PID>
 
 ```
 
@@ -165,10 +164,10 @@ nsenter -m -u -n -i -p -t 15492
 
 ```
 ps aux
-ip a
 ifconfig
 ls /bin
 cat /etc/hosts
+ip a
 ```
 
 Well, what can we do?  You can install software into this container.
@@ -183,6 +182,7 @@ Exit the container namespace with `CTRL+d` or `exit`.
 In addition to using `nsenter` to enter the namespace of your container, you can also execute commands in that namespace with `docker exec`.  
 
 ```
+docker exec <container-name OR container-id> <cmd>
 docker exec apache pwd
 ```
 

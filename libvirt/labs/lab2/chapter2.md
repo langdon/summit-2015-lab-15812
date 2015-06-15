@@ -11,6 +11,10 @@ of multiple services. We will also observe several bad practices when
 composing Dockerfiles and explore how to avoid those mistakes. In lab 3
 we will decompose the application into more manageable pieces.
 
+This lab should be performed on dev.example.com unless otherwise instructed.
+
+Username: root; Password: redhat
+
 Expected completion: 20-25 minutes
 
 Agenda:
@@ -57,7 +61,7 @@ docker run -p 80 --name=bigapp -e DBUSER=user -e DBPASS=mypassword -e DBNAME=myd
 docker ps
 ```
 
-Take a look at some of the arguments we are passing to Docker.  We are telling Docker that the image will be listening on port 80 inside the container and to randomly assign a port on the host that maps to port 80 in the container.  Next we are providing a name of **bigapp**.  After that we are setting some environment variables that will be passed into the contianer and consumed by the configuration scripts to set up the container.  Finally, we pass it the name of the image that we built in the prior step.
+Take a look at some of the arguments we are passing to Docker.  We are telling Docker that the image will be listening on port 80 inside the container and to randomly assign a port on the host that maps to port 80 in the container.  Next we are providing a ```name``` of ```bigapp```.  After that we are setting some environment variables that will be passed into the container and consumed by the configuration scripts to set up the container.  Finally, we pass it the name of the image that we built in the prior step.
 
 ### Exploring the Running Container
 
@@ -99,18 +103,18 @@ Press `CTRL+d` or type `exit` to exit the container shell.
 
 ### Connecting to the Application
 
-First detect the ip address of the host machine *and* the host port
-number that is is mapped to the container's port 80:
+First detect the host port number that is is mapped to the container's
+port 80:
 
 ```
-ip -4 -o addr
-docker port bigapp
+docker port bigapp #<port>
 ```
 
-Now connect to the port via the web browser on your machine using **http://ip:port**.  You can also use curl to connect, for example:
+Now connect to the port via the web browser on your machine using ```http://dev.example.com:<port>```.  You can also use curl to connect, for example:
 
-curl -L http://dev.example.com:32769
-
+```
+curl -L http://dev.example.com:<port>
+```
 
 ### Review Dockerfile practices
 
@@ -165,8 +169,7 @@ RUN yum -y install hostname
 >>> before you publish. You can check out the history of the image you
 >>> have created by running *docker history bigimg*.
 
-
-# Add in wordpress sources 
+# Add in wordpress sources
 COPY latest.tar.gz /latest.tar.gz
 
 >>> Consider using a specific version of Wordpress to control the installed version

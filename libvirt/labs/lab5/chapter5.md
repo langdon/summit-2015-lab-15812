@@ -4,7 +4,7 @@ In this lab we walk through packaging an application into a single deployment un
 
 So far in the previous labs we have:
 
-1. Decomposed an application into microservices
+1. Decomposed an application into services
 1. Created docker images and pushed them to a registry
 1. Created kubernetes files to orchestrate the running of the containers
 
@@ -22,6 +22,10 @@ In a production environment we still have several problems:
 * **Provider**: Plugin interface for specific deployment platform, an orchestration provider
 * **Artifacts**: Provider files
 * **Graph**: Declarative representation of dependencies in the context of a multi-container Nulecule application
+
+This lab should be performed on dev.example.com unless otherwise instructed.
+
+Username: root; Password: redhat
 
 ### Packaging Wordpress
 

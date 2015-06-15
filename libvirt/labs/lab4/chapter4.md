@@ -2,9 +2,13 @@
 
 In this lab we introduce how to orchestrate a multi-container application in Kubernetes.
 
+This lab should be performed on dev.example.com unless otherwise instructed.
+
+Username: root; Password: redhat
+
 Expected completion: 40-60 minutes
 
-Let's start with a little experimentation. I am sure you are all excited about your new blog site! And, now that it is getting super popular with 1000s of views per day, you are starting to worry about uptime.
+Let's start with a little experimentation. I am sure you are all excited about your new blog site! And, now that it is getting super popular with 1,000s of views per day, you are starting to worry about uptime.
 
 So, let's see what will happen. Launch the site:
 ```
@@ -63,11 +67,13 @@ docker start wordpress
 web browser -> http://dev.example.com OR curl -L http://dev.example.com #site should load
 ```
 
+**Note** if your page load doesn't work immediately, give wordpress another second or two to come up
+
 Starting and stopping is definitely easy, and fast. However, it is still pretty manual. What if we could automate the recovery? Or, in buzzword terms, "ensure the service remains up"? Enter Kubernetes. And, so you are up on the lingo, sometimes "kube" or "k8s".
 
 ### Pod Creation
 
-Let's get started by talking about a pod. A pod is a set of containers that provide one "service." How do you know what to put in a particular pod? Well, pod's containers need to be co-located on a host and need to be spawned and re-spawned together. So, if the containers always need to running on the same docker host, well, then they should be a pod.
+Let's get started by talking about a pod. A pod is a set of containers that provide one "service." How do you know what to put in a particular pod? Well, pod's containers need to be co-located on a host and need to be spawned and re-spawned together. So, if the containers always need to be running on the same docker host, well, then they should be a pod.
 
 **Note:** We will be putting this file together in steps to make it easier to explain what the different parts do. We will be identifying the part of the file to modify by looking for an "empty element" that we inserted earlier and then replacing that with a populated element.
 
@@ -78,8 +84,8 @@ vi ~/workspace/mariadb/kubernetes/mariadb-pod.yaml
 ```
 In that file, let's put in the pod identification information:
 ```
-apiVersion: v1beta3
 kind: Pod
+apiVersion: v1beta3
 metadata:
   labels:
     name: mariadb
@@ -123,8 +129,8 @@ Lastly, we need to configure the environment variables that need to be fed from 
 
 OK, now we are all done, and should have a file that looks like:
 ```
-apiVersion: v1beta3
 kind: Pod
+apiVersion: v1beta3
 metadata:
   labels:
     name: mariadb
@@ -157,8 +163,8 @@ vi ~/workspace/wordpress/kubernetes/wordpress-pod.yaml
 ```
 
 ```
-apiVersion: v1beta3
 kind: Pod
+apiVersion: v1beta3
 metadata:
   labels:
     name: wpfrontend
@@ -179,14 +185,25 @@ spec:
       protocol: TCP
 ```
 
-A couple things to notice about this file. Obviously, we change all the appropriate names to reflect "wordpress" but, largely, it is the same as the mariadb pod file. We also use the environment variables that are specified by the wordpress container, although they need to get the same values as the ones in the mariadb pod. Lastly, just to show you aren't bound to the image or pod names, we also changed the ```labels``` value to "wpfronted". 
+-A couple things to notice about this file. Obviously, we change all the
+appropriate names to reflect "wordpress" but, largely, it is the same as
+the mariadb pod file. We also use the environment variables that are specified
+by the wordpress container, although they need to get the same values as the
+ones in the mariadb pod. Lastly, just to show you aren't bound to the image or
+pod names, we also changed the ```labels``` value to "wpfronted".
 
-Ok, so, lets launch our pods and make sure they come up correctly. In order to do this, we need to introduce the ```kubectl``` command which is what drives Kubernetes. Generally, speaking, the format of ```kubectl``` commands is ```kubetctl <operation> <kind>```. Where ```<operation>``` is something like ```create```, ```get```, ```remove```, etc. and ```kind``` is the ```kind``` from the pod files.
+Ok, so, lets launch our pods and make sure they come up correctly. In
+order to do this, we need to introduce the ```kubectl``` command which is
+what drives Kubernetes. Generally, speaking, the format of ```kubectl```
+commands is ```kubetctl <operation> <kind>```. Where ```<operation>``` is
+something like ```create```, ```get```, ```remove```, etc. and ```kind```
+is the ```kind``` from the pod files.
 
 ```
 kubectl create -f ~/workspace/mariadb/kubernetes/mariadb-pod.yaml
 kubectl create -f ~/workspace/wordpress/kubernetes/wordpress-pod.yaml
 ```
+
 Now, I know i just said, ```kind``` is a parameter, but, as this is a create statement, it looks in the ```-f``` file for the ```kind```.
 
 Ok, let's see if they came up:
@@ -220,8 +237,8 @@ vi ~/workspace/mariadb/kubernetes/mariadb-service.yaml
 and insert the following content:
 
 ```
-apiVersion: v1beta3
 kind: Service
+apiVersion: v1beta3
 metadata:
   labels:
     name: mariadb
@@ -243,23 +260,23 @@ vi ~/workspace/wordpress/kubernetes/wordpress-service.yaml
 
 and insert:
 ```
- kind: Service
- apiVersion: v1beta3
- id: wpfrontend
- metadata:
-   labels:
-     name: wpfrontend
-   name: wpfrontend
- spec:
-   ports:
-   - port: 80
-     protocol: TCP
-     targetPort: 80
-   selector:
-     name: wpfrontend
-   publicIPs: 
-   - 192.168.135.2
- containerPort: 80
+kind: Service
+apiVersion: v1beta3
+id: wpfrontend
+metadata:
+  labels:
+    name: wpfrontend
+  name: wpfrontend
+spec:
+  ports:
+  - port: 80
+  protocol: TCP
+  targetPort: 80
+  selector:
+    name: wpfrontend
+  publicIPs:
+  - 192.168.135.2
+  containerPort: 80
 ```
 
 So, here you may notice, there is no reference to wordpress at all. In fact, we might even want to name the file wpfrontend-service.yaml to make it clearer that, in fact, we could have any pod that provides "wordpress capabilities". However, for a lab like this, I thought it would be confusing. 
@@ -315,12 +332,17 @@ Seemed awfully manual and ordered up there, didn't it? Just wait til Lab5 where 
 
 Now that we are satisfied that our containers and Kubernetes definitions work, let's try deploying it to a remote server.
 
-First, we have to add the remote cluster to our local configuration. However, before we do that, let's take a look at what we have already. Also, notice that the ``kubectl config``` follows the <noun> <verb> model. In other words, ```kubectl``` <noun>=```config``` <verb>=```view``` 
+First, we have to add the remote cluster to our local configuration. However,
+before we do that, let's take a look at what we have already. Also, notice that
+the ```kubectl config``` follows the <noun> <verb> model. In other words,
+```kubectl``` <noun>=```config``` <verb>=```view```
+
 ```
 kubectl config view
 ``` 
 
 Not much right? If you notice, we don't even have any information about the current context. In order to avoid losing our local connection, why don't we set up the local machine as a cluster first, before we add the remote. However, in order for the configuration to work correctly, we need to touch the config file first.
+
 ```
 mkdir ~/.kube
 touch ~/.kube/.kubeconfig
@@ -382,18 +404,25 @@ kubectl config set-context remote-context --cluster=remote
 kubectl config use-context remote-context
 kubectl config view
 ```
+
 You should now have ```current-context: remote-context```. Now, let's prove we are talking to the remote:
+
 ```
 kubectl get pods
 kubectl get services
 ```
-Nothing there, right? Ok, so let's start the bits up on the remote, deployment server.  Before we do that, we need to change the publicIP address in the service file so that it uses the IP address on the remote host that we are going to deploy the pod onto.
+
+Nothing there, right? Ok, so let's start the bits up on the remote deployment
+server.  Before we do that, we need to change the ```publicIP``` address in the service
+file so that it uses the IP address on the remote host that we are going to deploy
+the pod onto.
 
 Open the new service file and put the following definition in it. 
 
-vi ~/workspace/wordpress/kubernetes/wordpress-service-remote.yaml 
 
 ```
+vi ~/workspace/wordpress/kubernetes/wordpress-service-remote.yaml
+
 kind: Service
 apiVersion: v1beta3
 id: wpfrontend
@@ -442,6 +471,6 @@ wpfrontend      172.17.0.2:80
 
 Now to test it all you need to do is access the IP address and port of the service that is running.  You can either use a browser or curl:
 
-curl -L http://192.168.135.3
+curl -L http://deploy.example.com
 
 Ok, now you can move on to lab5, where Aaron will show you how to create an application much more easily.
