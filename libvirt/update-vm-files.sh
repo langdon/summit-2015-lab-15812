@@ -38,6 +38,8 @@ if ping $SERVER -c 1 > /dev/null 2>&1 ; then
     ssh -nNf -M -S "$HOME/.ssh/ctl/%L-%r@%h:%p" root@$SERVER
     #copy over the local.repo file
     rsync -e "ssh -S '$HOME/.ssh/ctl/%L-%r@%h:%p'" -avzP $SCRIPT_PATH/../shared-files/local.repo root@$SERVER:/etc/yum.repos.d/
+    #build the mariadb atomicapp
+    ssh -S '$HOME/.ssh/ctl/%L-%r@%h:%p' root@$SERVER "docker build -t mariadb-atomicapp /root/lab5/mariadb/."
     for i in `seq 1 5` ; do
 	rsync -e "ssh -S '$HOME/.ssh/ctl/%L-%r@%h:%p'" -avzP $SCRIPT_PATH/labs/lab$i/answer/* root@$SERVER:/root/answers/
 	rsync -e "ssh -S '$HOME/.ssh/ctl/%L-%r@%h:%p'" -avzP $SCRIPT_PATH/labs/lab$i/support/* root@$SERVER:/root/lab$i/
