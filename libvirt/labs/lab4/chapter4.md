@@ -331,8 +331,8 @@ Eventually, you should see:
 ```bash
 # kubectl get pods
 POD         IP           CONTAINER(S)   IMAGE(S)                         HOST                  LABELS            STATUS    CREATED
-mariadb     172.17.0.1   mariadb        summit-rhel-dev:5000/mariadb     127.0.0.1/127.0.0.1   name=mariadb      Running   2 hours
-wordpress   172.17.0.2   wordpress      summit-rhel-dev:5000/wordpress   127.0.0.1/127.0.0.1   name=wpfrontend   Running   2 hours
+mariadb     172.17.0.1   mariadb        dev.example.com:5000/mariadb     127.0.0.1/127.0.0.1   name=mariadb      Running   2 hours
+wordpress   172.17.0.2   wordpress      dev.example.com:5000/wordpress   127.0.0.1/127.0.0.1   name=wpfrontend   Running   2 hours
 ```
 
 ```bash
