@@ -1,4 +1,4 @@
-## LAB 5: Packaging an Atomic App -- Bonus/Preview
+# LAB 5: Packaging an Atomic App -- Bonus/Preview
 
 In this lab we walk through packaging an application into a single deployment unit. This is called an Atomic App and is based on the [Nulecule specification](https://github.com/projectatomic/nulecule/).
 
@@ -15,7 +15,7 @@ In a production environment we still have several problems:
 1. How can we re-use common services such as a database so we don't have to re-write them every time?
 1. How can we support different deployment targets (docker, kubernetes, openshift, etc) managed by a single deployment unit?
 
-### Terms
+## Terms
 
 * **Nulecule**: Nulecule is a specification that defines a pattern and model for packaging complex multi-container applications, referencing all their dependencies, including orchestration metadata in a container image for building, deploying, monitoring, and active management.
 * **Atomic app**: An implementation of the Nulecule specification. Atomic app supports running applications packaged as a Nulecule.
@@ -27,11 +27,11 @@ This lab should be performed on dev.example.com unless otherwise instructed.
 
 Username: root; Password: redhat
 
-### Packaging Wordpress
+## Packaging Wordpress
 
 In this section we package the Wordpress application as an Atomic App. To demonstrate the composite nature of Atomic apps we have pre-loaded the database Atomic app. In this use case a partnering software vendor might provide an Atomic app that is certified on Red Hat platforms. The Wordpress application will reference  and connect to the certified Atomic app database service.
 
-#### The Nulecule file
+### The Nulecule file
 
 1. Copy the Nulecule template files to the workspace directory.
 
@@ -71,7 +71,7 @@ Take a look at the Nulecule file. There are two primary sections: metadata and g
                 - file://artifacts/kubernetes/wordpress-pod.yaml     #CHANGEME
                 - file://artifacts/kubernetes/wordpress-service.yaml #CHANGEME
 
-#### Parameters
+### Parameters
 
 We want to allow some of the values in the kubernetes files to be changed at deployment time. Edit the Nulecule file to add the following parameters. Items without a default value will require input during deployment time. Replace the contents of the `params:` section with the list of parameters.
 
@@ -93,7 +93,7 @@ We want to allow some of the values in the kubernetes files to be changed at dep
 
 Save and close the Nulecule file.
 
-#### Provider files
+### Provider files
 
 We need to edit the kubernetes files so the values from the previous step can be replaced.
 
@@ -119,7 +119,7 @@ Edit the service file `~/workspace/artifacts/kubernetes/wordpress-service.yaml` 
  containerPort: 80
 ```
 
-#### Metadata
+### Metadata
 
 The Nulecule specification provides a section for arbitrary metadata. For this lab we will simply change a few values for demonstration purposes.
 
@@ -150,11 +150,11 @@ diff ~/workspace/artifacts/kubernetes/wordpress-pod.yaml ~/workspace/reference_f
 diff ~/workspace/artifacts/kubernetes/wordpress-service.yaml ~/workspace/reference_files/artifacts/kubernetes/wordpress-service.yaml
 ```
 
-### Test
+## Test
 
 Before we test our work let's switch back to local context.
 
-```
+```bash
 kubectl config use-context local-context
 kubectl config view
 ```
@@ -163,14 +163,14 @@ You should see `current-context: local-context`.
 
 Ensure we do not have any pods or services running from the previous lab.
 
-```
+```bash
 kubectl delete services wpfrontend mariadb
 kubectl delete pods wordpress mariadb
 ```
 
 Ensure they were deleted.
 
-```
+```bash
 kubectl get services
 kubectl get pods
 ```
@@ -200,7 +200,7 @@ The mariadb atomic app should be downloaded. Since it is a remote source the Mar
 
 Check the deployment progress in the same way we did in lab 4.
 
-```
+```bash
 kubectl get pods
 kubectl get services
 kubectl get endpoints
@@ -208,7 +208,7 @@ kubectl get endpoints
 
 View the sample answerfile.
 
-```
+```bash
 cat answers.conf.sample
 ```
 
@@ -216,13 +216,13 @@ This may be renamed `answers.conf` and used for future unattended deployments.
 
 When working with structured data files any YAML syntax error will cause a parsing failure. Use the diff commands above, check your files and run again.
 
-### Build
+## Build
 
 We will be packaging the atomic app as a self-executing metadata container. This way there is no "out of band" metadata mangement channel: everything is a container.
 
 Build the Atomic app. We will use the standard Dockerfile from the template unaltered.
 
-```
+```bash
 docker build -t wordpress-rhel7-atomicapp ~/workspace/.
 ```
 

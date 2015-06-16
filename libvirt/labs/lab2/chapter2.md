@@ -1,4 +1,4 @@
-## LAB 2: Analyzing a Monolithic Application
+# LAB 2: Analyzing a Monolithic Application
 
 Typically it is best to break down services into the simplest
 components and then containerize each of them independently. However,
@@ -26,7 +26,7 @@ Agenda:
 * Connecting to the application
 * Review Dockerfile practices
 
-### Monolithic Application Overview 
+## Monolithic Application Overview
 
 Our monolithic application we are going to use in this lab is a simple
 wordpress application. Rather than decompose the application into
@@ -41,29 +41,29 @@ are startup configuration scripts that are executed each time a
 container is started from the image. These scripts configure the
 services and then start them in the running container.
 
-### Building the Docker Image
+## Building the Docker Image
 
 To build the docker image for this lab please execute the following
 commands:
 
-```
+```bash
 cd /root/lab2/bigapp/
 docker build -t bigimg .
 ```
 
-### Run Container Based on Docker Image
+## Run Container Based on Docker Image
 
 To run the docker container based on the image we just built use the
 following command:
 
-```
+```bash
 docker run -p 80 --name=bigapp -e DBUSER=user -e DBPASS=mypassword -e DBNAME=mydb -d bigimg
 docker ps
 ```
 
 Take a look at some of the arguments we are passing to Docker.  We are telling Docker that the image will be listening on port 80 inside the container and to randomly assign a port on the host that maps to port 80 in the container.  Next we are providing a ```name``` of ```bigapp```.  After that we are setting some environment variables that will be passed into the container and consumed by the configuration scripts to set up the container.  Finally, we pass it the name of the image that we built in the prior step.
 
-### Exploring the Running Container
+## Exploring the Running Container
 
 Now that the container is running we will explore the running
 container to see what's going on inside. First off the processes were
@@ -73,7 +73,7 @@ the container. You can run `docker logs` to see the output. To follow or "tail" 
 **__NOTE:__** You are able to use the **name** of the container rather
 than the container id for most `docker` commands.
 
-```
+```bash
 docker logs -f bigapp 
 ```
 
@@ -81,10 +81,10 @@ docker logs -f bigapp
 
 
 If you need to inspect more than just the stderr/stdout of the machine
-then you can enter into the namespace of the container to insepct
+then you can enter into the namespace of the container to inspect
 things more closely. The easiest way to do this is to use `docker exec`. Try it out:
 
-```
+```bash
 docker exec -it bigapp /bin/bash
 pstree
 cat /var/www/html/wp-config.php | grep '=='
@@ -93,30 +93,30 @@ tail /var/log/httpd/access_log /var/log/httpd/error_log /var/log/mariadb/mariadb
 
 Explore the running processes.  Here you will httpd and MySQL running in the background.
 
-```
+```bash
 ps aux
 ```
 
 
 
-Press `CTRL+d` or type `exit` to exit the container shell.
+Press `CTRL+d` or type `exit` to leave the container shell.
 
-### Connecting to the Application
+## Connecting to the Application
 
 First detect the host port number that is is mapped to the container's
 port 80:
 
-```
+```bash
 docker port bigapp #<port>
 ```
 
 Now connect to the port via the web browser on your machine using ```http://dev.example.com:<port>```.  You can also use curl to connect, for example:
 
-```
+```bash
 curl -L http://dev.example.com:<port>
 ```
 
-### Review Dockerfile practices
+## Review Dockerfile practices
 
 So we have built a monolithic application using a somewhat complicated
 Dockerfile. There are a few principles that are good to follow when creating 
@@ -125,8 +125,8 @@ a Dockerfile that we did not follow for this monolithic app.
 To illustrate some problem points in our Dockerfile it has been 
 replicated below with some commentary added:
 
-```
-FROM registry.access.redhat.com/rhel  
+```dockerfile
+FROM registry.access.redhat.com/rhel
 
 >>> No tags on image specification - updates could break things
 
