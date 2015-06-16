@@ -14,7 +14,7 @@ spec:
       value: mypassword
     - name: DBNAME
       value: mydb
-    image: summit-rhel-dev:5000/mariadb
+    image: dev.example.com:5000/mariadb
     name: mariadb
     ports:
     - containerPort: 3306

@@ -5,7 +5,7 @@ cd ~/lab4
 
 echo "make sure your /etc/hosts file has the two servers listed"
 
-TARGET_IP=summit-rhel-dev:5000
+TARGET_IP='dev.example.com:5000'
 
 cp -R ~/lab4/* ~/workspace
 
