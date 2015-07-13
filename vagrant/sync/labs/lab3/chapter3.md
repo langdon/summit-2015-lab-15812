@@ -1,56 +1,58 @@
-## LAB 3: Deconstructing an application into microservices
+# LAB 3: Deconstructing an application into microservices
 
 In this lab you will deconstruct an application into microservices, creating a multi-container application. In this process we explore the challenges of networking, storage and configuration.
 
+This lab should be performed on dev.example.com unless otherwise instructed.
+
+Username: root; Password: redhat
+
 Expected completion: 20-30 minutes
 
-TODO: present an architectual graphic (deconstructed, microservices)
-
-### Decompose the application
+## Decompose the application
 
 In the previous lab we created an "all-in-one" application. Let's enter the container and explore.
 
-```
+```bash
 docker exec -it bigapp /bin/bash
 ```
 
-#### Services
+### Services
 
 From the container namespace list the log directories.
 
-```
+```bash
 ls -l /var/log/
 ```
 
 We see `httpd` and `mariadb`. These are the services that make up the Wordpress application.
 
-#### Ports
+### Ports
 
 We saw in the Dockerfile that port 80 was exposed. This is for the web server. Let's look at the mariadb logs for the port the database uses:
 
-```
+```bash
 grep port /var/log/mariadb/mariadb.log
 ```
 
 This shows port 3306 is used.
 
-#### Storage
+### Storage
 
-**Web server**
+#### Web server
 
 The Wordpress tar file was extracted into `/var/www/html`. List the files.
 
-```
+```bash
 ls -l /var/www/html
 ```
 
 If these files change and the container dies the changes will be lost. These files should be mounted to persistent storage on the host.
 
-**Database**
+#### Database
 
 Inspect the `mariadb.log` file to discover the database directory.
 
-```
+```bash
 grep databases /var/log/mariadb/mariadb.log
 ```
 
@@ -58,17 +60,17 @@ The `/var/lib/mysql` should also be mounted to persistent storage on the host.
 
 Once we've inspected the container stop and remove it. `docker ps -ql` prints the ID of the latest created container.  First you will need to exit the container.
 
-```
+```bash
 exit
 docker stop $(docker ps -ql)
 docker rm $(docker ps -ql)
 ```
 
-### Create the Dockerfiles
+## Create the Dockerfiles
 
 Now we will develop the two images. Using the information above and the Dockerfile from Lab 2 as a guide we will create Dockerfiles for each service. For this lab we have created a directory for each service with the required files for the service.  Please explore these directories and check out the contents and checkout the startup scripts.
 
-```
+```bash
 cd /root/workspace
 cp -R /root/lab3/mariadb .
 cp -R /root/lab3/wordpress .
@@ -76,7 +78,7 @@ ls -lR mariadb
 ls -lR wordpress
 ```
 
-#### MariaDB Dockerfile
+### MariaDB Dockerfile
 
 1. In a text editor create a file named `Dockerfile` in the `mariadb` directory.
 
@@ -90,12 +92,10 @@ ls -lR wordpress
 1. Add local files for this lab environment. This is only required for this lab.
 
         ADD ./local.repo /etc/yum.repos.d/local.repo
-        ADD ./hosts /new-hosts
 
 1. Add the required packages. We'll include `yum clean all` at the end to clear the yum cache.
 
-        RUN cat /new-hosts >> /etc/hosts && \
-            yum -y install mariadb-server openssl psmisc net-tools hostname && \
+        RUN yum -y install mariadb-server openssl psmisc net-tools hostname && \
             yum clean all
 
 1. Add the dependent scripts and make them executable.
@@ -117,7 +117,7 @@ ls -lR wordpress
 
 Save the file and exit the editor.
 
-#### Wordpress Dockerfile
+### Wordpress Dockerfile
 
 Now we'll create the Wordpress Dockerfile.
 
@@ -133,12 +133,10 @@ Now we'll create the Wordpress Dockerfile.
 1. Add local files for this lab environment. This is only required for this lab.
 
         ADD ./local.repo /etc/yum.repos.d/local.repo
-        ADD ./hosts /new-hosts
 
 1. Add the required packages. We'll include `yum clean all` at the end to clear the yum cache.
 
-        RUN cat /new-hosts >> /etc/hosts && \
-            yum -y install httpd php php-mysql php-gd openssl psmisc tar && \
+        RUN yum -y install httpd php php-mysql php-gd openssl psmisc tar && \
             yum clean all
 
 1. Add the dependent scripts and make them executable.
@@ -167,7 +165,7 @@ Now we'll create the Wordpress Dockerfile.
 
 Save the Dockerfile and exit the editor.
 
-### Build Images, Test and Push
+## Build Images, Test and Push
 
 Now we are ready to build the images to test our Dockerfiles.
 
@@ -214,7 +212,7 @@ Now we are ready to build the images to test our Dockerfiles.
 
 You may also load the Wordpress application in a browser to test full functionality.
 
-#### Simplify running containers with the atomic CLI
+### Simplify running containers with the atomic CLI
 
 When we have a working `docker run` recipe we want a way to communicate that to the end-user. The `atomic` tool is installed on both RHEL and Atomic hosts. It is useful in controlling the Atomic host as well as running containers. It is able to parse the `LABEL` instruction in a `Dockerfile`. The `LABEL RUN` instruction prescribes how the image is to be run. In addition to providing informative human-readable metadata, `LABEL`s may be used by the `atomic` CLI to run an image the way a developer designed it to run. This avoids having to copy+paste from README files.
 
@@ -233,7 +231,7 @@ When we have a working `docker run` recipe we want a way to communicate that to 
         atomic run wordpress
         curl -L http://localhost
 
-1. Once satisfied with the images tag them with the URI of the local lab local registry
+1. Once satisfied with the images tag them with the URI of the local lab local registry. The tag is what Docker uses to identify the particular image that we want to upload to a registry.
 
         docker tag mariadb dev.example.com:5000/mariadb
         docker tag wordpress dev.example.com:5000/wordpress
@@ -244,23 +242,23 @@ When we have a working `docker run` recipe we want a way to communicate that to 
         docker push dev.example.com:5000/mariadb
         docker push dev.example.com:5000/wordpress
 
-### Clean Up
+## Clean Up
 
 Stop the mariadb and wordpress containers.
 
-```
+```bash
 docker ps
 docker stop mariadb wordpress
 ```
 
 After iterating through running docker images you will likely end up with many stopped containers. List them.
 
-```
+```bash
 docker ps -a
 ```
 
 This command is useful in freeing up disk space by removing all stopped containers.
 
-```
+```bash
 docker rm $(docker ps -qa)
 ```

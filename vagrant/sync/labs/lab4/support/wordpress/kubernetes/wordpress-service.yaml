@@ -1,14 +1,18 @@
-apiVersion: v1beta3
 kind: Service
+apiVersion: v1beta3
+id: wpfrontend
 metadata:
   labels:
     name: wpfrontend
   name: wpfrontend
 spec:
-  createExternalLoadBalancer: true
   ports:
   - port: 80
     protocol: TCP
     targetPort: 80
   selector:
     name: wpfrontend
+  publicIPs:
+  - 192.168.135.2
+containerPort: 80
+

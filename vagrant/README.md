@@ -2,8 +2,6 @@
 Environment
 ===========
 
-### NOTE: this might be a little borked currently, concentrating on the libvirt version right now
-
 To set up the entire environment from F21 install packages (along with deps):
 
 ```
@@ -38,11 +36,11 @@ vagrant plugin install vagrant-reload
 vagrant plugin install vagrant-registration
 ```
 
-Download the boxes that we need:
+[Download](https://access.redhat.com/downloads/content/293/ver=1/rhel---7/1.0.1/x86_64/product-downloads) the boxes that we need, then:
 
 ```
-vagrant box add --name rhel-server-7 http://x.x.redhat.com/~lawhite/rhel-server-libvirt-7.1-1.x86_64.box
-vagrant box add --name rhel-atomic-7 http://x.x.redhat.com/~lawhite/rhel-atomic-libvirt-7.1-1.x86_64.box
+vagrant box add --name rhel-server-7 rhel-server-libvirt-7.1-1.x86_64.box
+vagrant box add --name rhel-atomic-7 rhel-atomic-libvirt-7.1-1.x86_64.box
 ```
 
 OPTIONAL: Set your rhn user/pass

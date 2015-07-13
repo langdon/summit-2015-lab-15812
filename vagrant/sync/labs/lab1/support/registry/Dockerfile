@@ -2,10 +2,9 @@ FROM registry.access.redhat.com/rhel:7.1-6
 MAINTAINER Student <student@foo.io>
 
 ADD ./local.repo /etc/yum.repos.d/local.repo
-ADD ./hosts /new-hosts
 ADD ./run-registry.sh /opt/registry/run-registry.sh
 
-RUN cat /new-hosts >> /etc/hosts && yum -y install docker-registry && yum clean all
+RUN yum -y install docker-registry && yum clean all
 RUN chmod -v 755 /opt/registry/run-registry.sh
 
 EXPOSE 5000

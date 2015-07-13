@@ -22,7 +22,7 @@ docker build -t mariadb -f mariadb/Dockerfile.reference mariadb/.
 docker build -t wordpress -f wordpress/Dockerfile.reference wordpress/.
 
 #TARGET_IP=$(ip addr | grep 'state UP' -A2 | tail -n1 | awk '{print $2}' | cut -f1  -d'/')
-TARGET_IP=summit-rhel-dev
+TARGET_IP='dev.example.com'
 
 docker tag -f mariadb $TARGET_IP:5000/mariadb
 docker tag -f wordpress $TARGET_IP:5000/wordpress
