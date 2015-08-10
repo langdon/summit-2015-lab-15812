@@ -77,6 +77,13 @@ web browser -> http://dev.example.com OR curl -L http://dev.example.com #site sh
 
 **Note** if your page load doesn't work immediately, give wordpress another second or two to come up
 
+Finally, let's kill off these containers to prepare for the next
+section.
+
+```bash
+docker rm -f wordpress mariadb
+```
+
 Starting and stopping is definitely easy, and fast. However, it is still pretty manual. What if we could automate the recovery? Or, in buzzword terms, "ensure the service remains up"? Enter Kubernetes. And, so you are up on the lingo, sometimes "kube" or "k8s".
 
 ## Pod Creation
