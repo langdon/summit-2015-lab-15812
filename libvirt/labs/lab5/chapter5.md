@@ -129,7 +129,7 @@ Open the Nulecule file in an editor. Edit the metadata section of the Nulecule f
 ---
 specversion: "0.0.2"
 
-id: summit-2015-wp
+id: containercon-2015-wp
 metadata:
   name: Wordpress
   appversion: v1.0.0
