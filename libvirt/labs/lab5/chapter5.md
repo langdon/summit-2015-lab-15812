@@ -181,11 +181,11 @@ Now we'll deploy Wordpress as an Atomic app.
 
         cd ~/workspace
 
-1. Inspect the Atomic app base container image. Notice how the `RUN` LABEL mounts in the current working directory with the `-v 'pwd':/atomicapp` option.
+1. Inspect the Atomic app base container image. Notice how the `RUN` LABEL mounts in the current working directory with the `-v 'pwd':/atomicapp` option. This allows for the files in the current directory to be inspected by atomicapp.
 
         atomic info projectatomic/atomicapp:0.1.1
 
-1. Run the Atomic app.
+1. Run the Atomic app. This will look at the files that we just created in the current directory and bring up the kubernetes services we requested.
 
         atomic run projectatomic/atomicapp:0.1.1
 
@@ -218,9 +218,22 @@ When working with structured data files any YAML syntax error will cause a parsi
 
 ## Build
 
-We will be packaging the atomic app as a self-executing metadata container. This way there is no "out of band" metadata mangement channel: everything is a container.
+So we just used `atomicapp` to start containers/services using files from a local working directory. Now let's build a container with those files that we can distribute to others to use. 
 
-Build the Atomic app. We will use the standard Dockerfile from the template unaltered.
+Notice one of the files that got populated from the template into the local directory is a `Dockerfile` with these contents:
+
+```
+FROM projectatomic/atomicapp:0.1.1
+
+MAINTAINER Student <student@foo.io>
+
+ADD /Nulecule /Dockerfile /application-entity/
+ADD /artifacts /application-entity/artifacts
+```
+
+Building this Dockerfile yields a container that has the `Nulecule` and `artifacts` that we just created. This new container will also be layered on top of `projectatomic/atomicapp:0.1.1` so it automatically contains the atomicapp software. This *atomic app* we are creating is a self-executing metadata container. This way there is no "out of band" metadata mangement channel: everything is a container.
+
+To build the *atomic app* you simply use the `docker build` command.
 
 ```bash
 docker build -t wordpress-rhel7-atomicapp ~/workspace/.
