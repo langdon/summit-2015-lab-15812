@@ -212,7 +212,7 @@ View the sample answerfile.
 cat answers.conf.sample
 ```
 
-This may be renamed `answers.conf` and used for future unattended deployments.
+This may be renamed `answers.conf` and populated with answers to the questions that would be asked on run. This is useful for unattended deployments.
 
 When working with structured data files any YAML syntax error will cause a parsing failure. Use the diff commands above, check your files and run again.
 
