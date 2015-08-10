@@ -142,7 +142,7 @@ metadata:
 
 Save and close the file.
 
-That completes the Nulecule file work. You can check your work against the reference file for this lab in `~/workspace/Nulecule.reference`.
+That completes the Nulecule file work. You can check your work against the reference file for this lab in `~/workspace/reference_files/`.
 
 ```
 diff ~/workspace/Nulecule ~/workspace/reference_files/Nulecule
