@@ -196,19 +196,19 @@ To prepare for the next lab let's deploy a simple registry to store our images.
 
 Inspect the Dockerfile that has been prepared. Notice the defaults that have been chosen. These may be overriden.
 
-```cat registry/Dockerfile```{.bash}
+```cat registry/Dockerfile```
 
 Build the registry
 
-```docker build -t registry registry/```{.bash}
+```docker build -t registry registry/```
 
 Run the registry in daemonized mode using default parameters. However, we want to make sure this container always comes back on docker restarts or machine reboots. As a result, we include ```--restart="always"```.
 
-```docker run  --restart="always" --name registry -p 5000:5000 -d registry```{.bash}
+```docker run  --restart="always" --name registry -p 5000:5000 -d registry```
 
 Confirm the registry is running.
 
-```docker ps```{.bash}
+```docker ps```
 
 In the next lab we will be pushing our work to this registry. Before we can do so we need to configure the docker client to connect to the registry insecurely since we do not have a CA-signed certificate.
 
@@ -216,9 +216,9 @@ Edit `/etc/sysconfig/docker`
 
 Find the line in the file that has INSECURE_REGISTRY and make the following change.  We are telling Docker that it is safe to use this registry.
 
-```INSECURE_REGISTRY='--insecure-registry dev.example.com:5000'```{.bash}
+```INSECURE_REGISTRY='--insecure-registry dev.example.com:5000'```
 
 Save, exit and restart docker daemon
 
-```systemctl restart docker```{.bash}
+```systemctl restart docker```
 
