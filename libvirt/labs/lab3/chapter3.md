@@ -262,3 +262,5 @@ This command is useful in freeing up disk space by removing all stopped containe
 ```bash
 docker rm $(docker ps -qa)
 ```
+
+This command will result in a cosmetic error because it is trying to stop a running container - the registry.  This can safely be ignored.
